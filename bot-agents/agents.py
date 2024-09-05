@@ -3,7 +3,6 @@ import os
 from dotenv import load_dotenv
 from prompts import evaluator_prompt_v1, condesnor_prompt_v1
 from temp import temporary_job, temporary_resume
-import json
 from langsmith import Client
 
 client = Client()
@@ -33,7 +32,7 @@ class EvaluatorAgent(Agent):
         self.system_prompt = evaluator_prompt_v1(resume=resume)
 
 
-class Graph:
+class CondensorEvaluatorGraph:
     def __init__(self, condensor: CondensorAgent, evaluator: EvaluatorAgent):
         self.condensor = condensor
         self.evaluator = evaluator
@@ -66,7 +65,7 @@ if __name__ == "__main__":
 
     condensor = CondensorAgent(model)
     evaluator = EvaluatorAgent(model, resume=temporary_resume())
-    graph = Graph(condensor, evaluator)
+    graph = CondensorEvaluatorGraph(condensor, evaluator)
 
     response = graph.execute_graph(temporary_job())
     print(response)
