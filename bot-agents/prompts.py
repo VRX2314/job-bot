@@ -52,6 +52,8 @@ company: the name of the company
 score: the calculated suitability score, should in range of 0 to 1
 reasons_match: a list of strings containing short reasons and descriptions of why candidate is a good fit and should apply. This field should have at max 5 strings.
 reasons_no_match: a list of strings containing short reasons and descriptions of why candidate is not a good fit and should apply. This field should have at max 5 strings.
+reasons_match_c: one to three word descriptions of each string in reasons_match.
+reasons_no_match_c: one to three word descriptions of each string in reasons_no_match.
 When stating reasons, the reasons should be in first person perspective to the candidate, use words such as you and your.""".format(
         user_resume=resume
     )
