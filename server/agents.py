@@ -49,13 +49,22 @@ class CondensorEvaluatorGraph:
         )
         CondensorEvaluatorGraph.api_calls += 1
 
-        evaluated_json = {
-            "response_condensor": condensed_information.content,
-            "metadata_condensor": condensed_information.response_metadata,
-            "response_evaluator": evaluated_information.content,
-            "metadata_evaluator": evaluated_information.response_metadata,
-            "api_calls": CondensorEvaluatorGraph.api_calls,
-        }
+        try:
+            evaluated_json = {
+                "response_condensor": condensed_information.content,
+                "metadata_condensor": json.loads(
+                    json.dumps(condensed_information.response_metadata, indent=2)
+                ),
+                "response_evaluator": json.loads(evaluated_information.content),
+                "metadata_evaluator": json.loads(
+                    json.dumps(evaluated_information.response_metadata, indent=2)
+                ),
+                "api_calls": CondensorEvaluatorGraph.api_calls,
+            }  # Give Camel Case names
+
+        except Exception as e:
+            print("PARSER ERROR\n")
+            print(e)
 
         return json.dumps(evaluated_json, indent=2)
 
