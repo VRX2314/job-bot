@@ -4,3 +4,5 @@ __pycache__
 job-data-extractor
 temp.*
 temp
+node_modules
+.next
