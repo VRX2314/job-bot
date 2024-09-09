@@ -1,5 +1,10 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+.mainContainer{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    width: 100vw;
+    column-gap: 3em;
+    row-gap: 3em;
+    flex-wrap: wrap;
 }
