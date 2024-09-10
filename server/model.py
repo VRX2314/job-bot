@@ -1,5 +1,5 @@
 from crawler import Crawler
-from agents import CondensorAgent, EvaluatorAgent, CondensorEvaluatorGraph
+from agents import CondensorAgent, EvaluatorAgent, CondensorEvaluatorGraph, HybridAgent
 from playwright.async_api import async_playwright
 
 
@@ -8,11 +8,12 @@ class LLMCrawler(Crawler):
         super().__init__(config)
         self.condensor = CondensorAgent(model)
         self.evaluator = EvaluatorAgent(model, resume)
+        self.hybrid = HybridAgent(model, resume)
         self.condensor_evaluator_graph = CondensorEvaluatorGraph(
-            self.condensor, self.evaluator
+            self.condensor, self.evaluator, self.hybrid
         )
 
-    async def scrape(self):
+    async def scrape(self, hybrid: bool = False):
         async with async_playwright() as p:
             ctx = 0
             await self._load_browser(p)
@@ -25,9 +26,14 @@ class LLMCrawler(Crawler):
 
                 for job in job_elements:
                     scraped_job = await self.scrape_indeed(job)
-                    response = self.condensor_evaluator_graph.execute_graph(
-                        f"{scraped_job}"
-                    )
+                    if hybrid:
+                        response = self.condensor_evaluator_graph.execute_hybrid_graph(
+                            f"{scraped_job}"
+                        )
+                    else:
+                        response = self.condensor_evaluator_graph.execute_graph(
+                            f"{scraped_job}"
+                        )
 
                     yield f"{response}"
 

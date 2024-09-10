@@ -1,7 +1,11 @@
 from langchain_groq import ChatGroq
 import os
 from dotenv import load_dotenv
-from prompts import evaluator_prompt_v1, condesnor_prompt_v1
+from prompts import (
+    evaluator_prompt_v1,
+    condesnor_prompt_v1,
+    condensor_evaluator_hybrid_prompt_v1,
+)
 from temp import temporary_job, temporary_resume
 from langsmith import Client
 import json
@@ -33,12 +37,21 @@ class EvaluatorAgent(Agent):
         self.system_prompt = evaluator_prompt_v1(resume=resume)
 
 
+class HybridAgent(Agent):
+    def __init__(self, model, resume):
+        super().__init__(model)
+        self.system_prompt = condensor_evaluator_hybrid_prompt_v1(resume=resume)
+
+
 class CondensorEvaluatorGraph:
     api_calls = 0
 
-    def __init__(self, condensor: CondensorAgent, evaluator: EvaluatorAgent):
+    def __init__(
+        self, condensor: CondensorAgent, evaluator: EvaluatorAgent, hybrid: HybridAgent
+    ):
         self.condensor = condensor
         self.evaluator = evaluator
+        self.hybrid = hybrid
 
     def execute_graph(self, condensor_prompt: str) -> dict:
         condensed_information = self.condensor.generate_response(condensor_prompt)
@@ -55,6 +68,25 @@ class CondensorEvaluatorGraph:
                 "metadata_condensor": json.loads(
                     json.dumps(condensed_information.response_metadata, indent=2)
                 ),
+                "response_evaluator": json.loads(evaluated_information.content),
+                "metadata_evaluator": json.loads(
+                    json.dumps(evaluated_information.response_metadata, indent=2)
+                ),
+                "api_calls": CondensorEvaluatorGraph.api_calls,
+            }  # Give Camel Case names
+
+        except Exception as e:
+            print("PARSER ERROR\n")
+            print(e)
+
+        return json.dumps(evaluated_json, indent=2)
+
+    def execute_hybrid_graph(self, prompt: str) -> dict:
+        evaluated_information = self.hybrid.generate_response(prompt)
+        CondensorEvaluatorGraph.api_calls += 1
+
+        try:
+            evaluated_json = {
                 "response_evaluator": json.loads(evaluated_information.content),
                 "metadata_evaluator": json.loads(
                     json.dumps(evaluated_information.response_metadata, indent=2)
