@@ -7,9 +7,9 @@ A fullstack Generative AI project that uses LLMs and Web Scraping to find the mo
 ### TODO
 
 - [x] Integrate ShadCDN
-- [ ] Complete UI
+- [x] Complete UI
 - [ ] Make UI Responsive
-- [ ] Improve Scraper Speed
+- [x] Improve Scraper Speed
 
 ### Repository Branches
 
