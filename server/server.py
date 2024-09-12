@@ -77,7 +77,7 @@ async def stream_llm_hybrid():
 
 
 async def stream_json():
-    with open("./temp/dummy.json") as json_data:
+    with open("./temp/hybrid.json") as json_data:
         data = json.load(json_data)
         json_data.close()
 

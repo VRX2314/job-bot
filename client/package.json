@@ -9,17 +9,31 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@radix-ui/react-menubar": "^1.1.1",
+    "@radix-ui/react-navigation-menu": "^1.2.0",
+    "@radix-ui/react-select": "^2.1.1",
+    "@radix-ui/react-slot": "^1.1.0",
+    "boxicons": "^2.1.4",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
     "cors": "^2.8.5",
+    "lucide-react": "^0.439.0",
     "next": "14.2.8",
+    "next-themes": "^0.3.0",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "tailwind-merge": "^2.5.2",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "autoprefixer": "^10.4.20",
     "eslint": "^8",
     "eslint-config-next": "14.2.8",
+    "postcss": "^8.4.45",
+    "tailwindcss": "^3.4.10",
     "typescript": "^5"
   }
 }
