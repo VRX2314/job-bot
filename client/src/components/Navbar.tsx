@@ -1,4 +1,5 @@
 import React from "react";
+
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -11,13 +12,12 @@ import {
 } from "@/components/ui/navigation-menu";
 
 import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
-
 import Link from "next/link";
 
 const Navbar = () => {
   return (
     // Add Link Elements for Each Page
-    <NavigationMenu className="w-full max-w-full border">
+    <NavigationMenu className="w-full min-w-full border-b justify-center">
       <NavigationMenuList>
         <NavigationMenuItem>
           <Link href="/" legacyBehavior passHref>

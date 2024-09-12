@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 
 import heroImage from "../assets/bot_dummy.png";
+import DebugMenu from "@/components/DebugMenu";
 
 const page = () => {
   let [jobGridComponentList, setJobGridComponentList] = useState<JSX.Element[]>(
@@ -70,7 +71,7 @@ const page = () => {
 
   const generateResponse = async () => {
     let tempId = 0;
-    const response = await fetch("http://127.0.0.1:8000/stream-test", {
+    const response = await fetch("http://127.0.0.1:8000/stream-llm-hybrid", {
       method: "GET",
       headers: { "Content-Type": "application/json+stream" },
     });
@@ -93,7 +94,7 @@ const page = () => {
       console.log(jobData);
       setJobGridComponentList((prev) => [
         ...prev,
-        <JobGridComponent
+        <JobGridCard
           key={tempId}
           title={jobData.response_evaluator.job_title}
           company={jobData.response_evaluator.company}
@@ -110,6 +111,7 @@ const page = () => {
 
   return (
     <div className="flex flex-col justify-center items-center">
+      <DebugMenu gen={() => generateResponse()} />
       <div className="flex flex-col justify-center items-center w-full max-w-full">
         <Image
           className="my-4"
@@ -176,13 +178,8 @@ const page = () => {
           <i className="bx bx-cog text-2xl pr-1"></i>Configure
         </Button>
       </div>
-      <div className="flex flex-wrap justify-evenly gap-8 mt-16 w-full px-8 lg:p-0 md:w-11/12 xl:w-10/12 mb-8">
-        <JobGridCard />
-        <JobGridCard />
-        <JobGridCard />
-        <JobGridCard />
-        <JobGridCard />
-        <JobGridCard />
+      <div className="flex flex-wrap justify-start gap-8 mt-16 w-full px-8 lg:p-0 md:w-11/12 xl:w-10/12 mb-8">
+        {jobGridComponentList}
       </div>
     </div>
   );
