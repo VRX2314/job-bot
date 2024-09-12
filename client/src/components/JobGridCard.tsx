@@ -17,6 +17,8 @@ const JobGridCard = ({
   reasons_match,
   reasons_no_match,
 }) => {
+  const scoreFactor = score * 120;
+  console.log(scoreFactor);
   const pillComponents = (reasons: [], flag: boolean) => {
     let pillColor = "";
     if (flag) {
@@ -41,13 +43,16 @@ const JobGridCard = ({
       <CardHeader className="flex flex-row justify-between items-center m-0 p-2 space-y-0">
         <div className="m-0 font-medium flex items-center border border-slate-300 p-2 rounded-full">
           <i className="bx bx-calendar pr-1 text-2xl gradient-blue-font"></i>
-          11/09/24
+          12/09/24
         </div>
-        <div className="m-0 font-semibold text-green-500">
+        <div
+          className={`m-0 font-semibold`}
+          style={{ color: `hsl(${scoreFactor},100%,40%)` }}
+        >
           {score * 100}% Match
         </div>
       </CardHeader>
-      <CardContent className="p-2 pt-4 min-h-[516px]">
+      <CardContent className="p-`2 pt-4 min-h-[516px]">
         <div className="flex flex-col gap-0">
           {/* {Comapny and Designation} */}
           <p className="font-semibold text-[1rem] gradient-blue-font">

@@ -5,7 +5,7 @@ import JobGridComponent from "@/components/JobGridComponent";
 import JobGridCard from "@/components/JobGridCard";
 import Image from "next/image";
 
-import { useState } from "react";
+import { use, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,9 +21,13 @@ import heroImage from "../assets/bot_dummy.png";
 import DebugMenu from "@/components/DebugMenu";
 
 const page = () => {
-  let [jobGridComponentList, setJobGridComponentList] = useState<JSX.Element[]>(
-    []
-  );
+  const [jobGridComponentList, setJobGridComponentList] = useState<
+    JSX.Element[]
+  >([]);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchLocation, setSearchLocation] = useState("");
+  const [selectedOption, setSelectedOption] = useState("linkedin");
 
   let jobData = {
     response_condensor: "",
@@ -71,10 +75,13 @@ const page = () => {
 
   const generateResponse = async () => {
     let tempId = 0;
-    const response = await fetch("http://127.0.0.1:8000/stream-llm-hybrid", {
-      method: "GET",
-      headers: { "Content-Type": "application/json+stream" },
-    });
+    const response = await fetch(
+      `http://127.0.0.1:8000/stream-llm-hybrid?query=${searchQuery}&location=${searchLocation}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json+stream" },
+      }
+    );
 
     if (!response.ok || !response.body) {
       throw response.statusText;
@@ -107,11 +114,14 @@ const page = () => {
     }
   };
 
-  const [selectedOption, setSelectedOption] = useState("linkedin");
+  const logger = () => {
+    console.log(searchQuery);
+    console.log(searchLocation);
+  };
 
   return (
     <div className="flex flex-col justify-center items-center">
-      <DebugMenu gen={() => generateResponse()} />
+      <DebugMenu gen={() => generateResponse(0, 0)} />
       <div className="flex flex-col justify-center items-center w-full max-w-full">
         <Image
           className="my-4"
@@ -130,13 +140,21 @@ const page = () => {
           <Input
             className="border-0 border-r-2 rounded-r-none border-slate-300 h-full"
             placeholder="Job Titles, Companies"
+            onChange={(event) => setSearchQuery(event.target.value)}
           />
         </div>
         <div className="flex flex-row items-center w-5/12 h-full">
           <i className="bx bx-map-pin text-2xl pl-4 gradient-blue-font"></i>
-          <Input className="border-0 h-full" placeholder="Country" />
+          <Input
+            className="border-0 h-full"
+            placeholder="Country"
+            onChange={(event) => setSearchLocation(event.target.value)}
+          />
         </div>
-        <Button className="rounded-full p-0 mr-1 self-center gradient-blue">
+        <Button
+          className="rounded-full p-0 mr-1 self-center gradient-blue"
+          onClick={generateResponse}
+        >
           <i className="bx bx-search-alt text-2xl m-2"></i>
         </Button>
       </div>
