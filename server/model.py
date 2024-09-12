@@ -38,7 +38,7 @@ class LLMCrawler(Crawler):
                     yield f"{response}"
 
                     ctx += 1
-                    if ctx > 3:
+                    if ctx > 8:
                         break
 
                     if self.pages > 1:
