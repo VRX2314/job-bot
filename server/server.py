@@ -60,8 +60,24 @@ async def stream_llm():
     return StreamingResponse(crawler.scrape(), media_type="text/event-stream")
 
 
-@app.get("/stream-llm-hybrid")
-async def stream_llm_hybrid():
+# @app.get("/stream-llm-hybrid")
+# async def stream_llm_hybrid():
+#     config_path = "./config/config.json"
+#     if os.path.exists(config_path):
+#         with open(config_path, "r") as file:
+#             config = json.load(file)
+#         print("Config loaded:", config)
+#     else:
+#         print(f"Config file {config_path} does not exist.")
+#     crawler = LLMCrawler(config, model, temporary_resume())
+
+#     return StreamingResponse(
+#         crawler.scrape(hybrid=True), media_type="text/event-stream"
+#     )
+
+
+@app.post("/stream-llm-hybrid")
+async def stream_llm_hybrid(query: str, location: str):
     config_path = "./config/config.json"
     if os.path.exists(config_path):
         with open(config_path, "r") as file:
@@ -69,7 +85,7 @@ async def stream_llm_hybrid():
         print("Config loaded:", config)
     else:
         print(f"Config file {config_path} does not exist.")
-    crawler = LLMCrawler(config, model, temporary_resume())
+    crawler = LLMCrawler(config, query, location, model, temporary_resume())
 
     return StreamingResponse(
         crawler.scrape(hybrid=True), media_type="text/event-stream"

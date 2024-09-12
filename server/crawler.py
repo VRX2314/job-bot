@@ -2,13 +2,13 @@ from datetime import datetime
 
 
 class Crawler:
-    def __init__(self, config):
+    def __init__(self, config, query, location):
         self.browser = None
         self.page = None
 
-        self.query = config["query"]
+        self.query = query
         self.pages = config["pages"]
-        self.location = config["location"]
+        self.location = location
 
         self.today = datetime.today().date()
 

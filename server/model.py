@@ -4,8 +4,8 @@ from playwright.async_api import async_playwright
 
 
 class LLMCrawler(Crawler):
-    def __init__(self, config, model, resume):
-        super().__init__(config)
+    def __init__(self, config, query, location, model, resume):
+        super().__init__(config, query, location)
         self.condensor = CondensorAgent(model)
         self.evaluator = EvaluatorAgent(model, resume)
         self.hybrid = HybridAgent(model, resume)
