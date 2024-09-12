@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import styles from "@/styles/main.module.css";
 import JobGridComponent from "@/components/JobGridComponent";
+import JobGridCard from "@/components/JobGridCard";
 import Image from "next/image";
 
 import { useState } from "react";
@@ -105,16 +106,24 @@ const page = () => {
     }
   };
 
+  const [selectedOption, setSelectedOption] = useState("linkedin");
+
   return (
     <div className="flex flex-col justify-center items-center">
       <div className="flex flex-col justify-center items-center w-full max-w-full">
-        <Image src={heroImage} width={216} height={216} alt="hero" />
-        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl mt-4">
+        <Image
+          className="my-4"
+          src={heroImage}
+          width={216}
+          height={216}
+          alt="hero"
+        />
+        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
           Job Seeker V1
         </h1>
       </div>
-      <div className="flex mt-12 border border-slate-300 rounded-full items-center justify-center min-w-[1000px] w-7/12 pl-4 h-12">
-        <div className="flex flex-row items-center w-7/12 h-full">
+      <div className="flex mt-12 border border-slate-300 rounded-full items-center justify-center xl:min-w-[1000px] md:w-11/12 xl:w-7/12 h-12">
+        <div className="flex flex-row items-center w-7/12 h-full pl-4">
           <i className="bx bx-briefcase-alt text-2xl gradient-blue-font"></i>
           <Input
             className="border-0 border-r-2 rounded-r-none border-slate-300 h-full"
@@ -129,8 +138,13 @@ const page = () => {
           <i className="bx bx-search-alt text-2xl m-2"></i>
         </Button>
       </div>
-      <div className="flex flex-row mt-8 gap-4 max-w-fit">
-        <Select>
+      <div className="flex flex-col lg:flex-row flex-wrap items-center justify-center mt-8 gap-4 max-w-fit">
+        <Select
+          defaultValue={selectedOption}
+          onValueChange={(value) => {
+            setSelectedOption(value);
+          }}
+        >
           <SelectTrigger className="w-[200px] border-slate-300">
             <SelectValue placeholder="Select Portal" />
           </SelectTrigger>
@@ -161,6 +175,14 @@ const page = () => {
         <Button className="gradient-blue">
           <i className="bx bx-cog text-2xl pr-1"></i>Configure
         </Button>
+      </div>
+      <div className="flex flex-wrap justify-evenly gap-8 mt-16 w-full px-8 lg:p-0 md:w-11/12 xl:w-10/12 mb-8">
+        <JobGridCard />
+        <JobGridCard />
+        <JobGridCard />
+        <JobGridCard />
+        <JobGridCard />
+        <JobGridCard />
       </div>
     </div>
   );
