@@ -1,11 +1,9 @@
 "use client";
 import "../styles/global.css";
-import styles from "@/styles/main.module.css";
-import JobGridComponent from "@/components/JobGridComponent";
 import JobGridCard from "@/components/JobGridCard";
 import Image from "next/image";
 
-import { use, useState } from "react";
+import { useState, useRef } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,14 +18,19 @@ import {
 import heroImage from "../assets/bot_dummy.png";
 import DebugMenu from "@/components/DebugMenu";
 
-const page = () => {
+const Home = () => {
   const [jobGridComponentList, setJobGridComponentList] = useState<
     JSX.Element[]
   >([]);
 
+  const [persistJobGridComponentList, setPersistJobGridComponentList] =
+    useState<JSX.Element[]>([]);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
   const [selectedOption, setSelectedOption] = useState("linkedin");
+
+  const gridRef = useRef<HTMLDivElement | null>(null);
 
   let jobData = {
     response_condensor: "",
@@ -74,14 +77,24 @@ const page = () => {
   };
 
   const generateResponse = async () => {
+    setPersistJobGridComponentList((prevList) => [
+      ...prevList,
+      ...jobGridComponentList,
+    ]);
+    gridRef.current?.scrollIntoView({ behavior: "smooth" });
     let tempId = 0;
-    const response = await fetch(
-      `http://127.0.0.1:8000/stream-llm-hybrid?query=${searchQuery}&location=${searchLocation}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json+stream" },
-      }
-    );
+    // const response = await fetch(
+    //   `http://127.0.0.1:8000/stream-llm-hybrid?query=${searchQuery}&location=${searchLocation}`,
+    //   {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json+stream" },
+    //   },
+    // );
+
+    const response = await fetch(`http://127.0.0.1:8000/stream-test`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json+stream" },
+    });
 
     if (!response.ok || !response.body) {
       throw response.statusText;
@@ -89,6 +102,7 @@ const page = () => {
 
     const reader = response.body?.getReader();
     const decoder = new TextDecoder();
+    let jobDataList = [];
 
     while (true) {
       const { value, done } = await reader.read();
@@ -99,18 +113,26 @@ const page = () => {
       const decodedChunk = decoder.decode(value, { stream: true });
       jobData = JSON.parse(decodedChunk);
       console.log(jobData);
-      setJobGridComponentList((prev) => [
-        ...prev,
-        <JobGridCard
-          key={tempId}
-          title={jobData.response_evaluator.job_title}
-          company={jobData.response_evaluator.company}
-          score={jobData.response_evaluator.score}
-          reasons_match={jobData.response_evaluator.reasons_match_c}
-          reasons_no_match={jobData.response_evaluator.reasons_no_match_c}
-        />,
-      ]);
+
+      jobDataList.push({
+        jobCard: (
+          <JobGridCard
+            key={tempId}
+            title={jobData.response_evaluator.job_title}
+            company={jobData.response_evaluator.company}
+            score={jobData.response_evaluator.score}
+            reasons_match={jobData.response_evaluator.reasons_match_c}
+            reasons_no_match={jobData.response_evaluator.reasons_no_match_c}
+          />
+        ),
+        score: jobData.response_evaluator.score,
+      });
+
       tempId += 1;
+
+      jobDataList.sort((a, b) => b.score - a.score);
+      let sortedJobGridComponents = jobDataList.map((data) => data.jobCard);
+      setJobGridComponentList([...sortedJobGridComponents]);
     }
   };
 
@@ -120,9 +142,9 @@ const page = () => {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center">
-      <DebugMenu gen={() => generateResponse(0, 0)} />
-      <div className="flex flex-col justify-center items-center w-full max-w-full">
+    <div className="flex flex-col items-center justify-center">
+      <DebugMenu gen={() => generateResponse()} />
+      <div className="flex w-full max-w-full flex-col items-center justify-center">
         <Image
           className="my-4"
           src={heroImage}
@@ -134,31 +156,31 @@ const page = () => {
           Job Seeker V1
         </h1>
       </div>
-      <div className="flex mt-12 border border-slate-300 rounded-full items-center justify-center xl:min-w-[1000px] md:w-11/12 xl:w-7/12 h-12">
-        <div className="flex flex-row items-center w-7/12 h-full pl-4">
-          <i className="bx bx-briefcase-alt text-2xl gradient-blue-font"></i>
+      <div className="mt-12 flex h-12 items-center justify-center rounded-full border border-slate-300 md:w-11/12 xl:w-7/12 xl:min-w-[1000px]">
+        <div className="flex h-full w-7/12 flex-row items-center pl-4">
+          <i className="bx bx-briefcase-alt gradient-blue-font text-2xl"></i>
           <Input
-            className="border-0 border-r-2 rounded-r-none border-slate-300 h-full"
+            className="h-full rounded-r-none border-0 border-r-2 border-slate-300 focus-visible:ring-transparent focus-visible:ring-offset-0"
             placeholder="Job Titles, Companies"
             onChange={(event) => setSearchQuery(event.target.value)}
           />
         </div>
-        <div className="flex flex-row items-center w-5/12 h-full">
-          <i className="bx bx-map-pin text-2xl pl-4 gradient-blue-font"></i>
+        <div className="flex h-full w-5/12 flex-row items-center">
+          <i className="bx bx-map-pin gradient-blue-font pl-4 text-2xl"></i>
           <Input
-            className="border-0 h-full"
+            className="h-full border-0 focus-visible:ring-transparent focus-visible:ring-offset-0"
             placeholder="Country"
             onChange={(event) => setSearchLocation(event.target.value)}
           />
         </div>
         <Button
-          className="rounded-full p-0 mr-1 self-center gradient-blue"
+          className="gradient-blue mr-1 self-center rounded-full p-0"
           onClick={generateResponse}
         >
-          <i className="bx bx-search-alt text-2xl m-2"></i>
+          <i className="bx bx-search-alt m-2 text-2xl"></i>
         </Button>
       </div>
-      <div className="flex flex-col lg:flex-row flex-wrap items-center justify-center mt-8 gap-4 max-w-fit">
+      <div className="mt-8 flex max-w-fit flex-col flex-wrap items-center justify-center gap-4 lg:flex-row">
         <Select
           defaultValue={selectedOption}
           onValueChange={(value) => {
@@ -171,7 +193,7 @@ const page = () => {
           <SelectContent>
             <SelectItem value="linkedin">
               <div className="flex items-center gap-1">
-                <i className="bx bxl-linkedin-square text-2xl gradient-blue-font"></i>
+                <i className="bx bxl-linkedin-square gradient-blue-font text-2xl"></i>
                 LinkedIn
               </div>
             </SelectItem>
@@ -187,20 +209,29 @@ const page = () => {
             </SelectItem>
           </SelectContent>
         </Select>
-        <Input type="file" className="border-slate-300 w-fit" />
+        <Input type="file" className="w-fit border-slate-300" />
         <Button variant="outline" className="border-slate-300">
-          <i className="bx bxs-magic-wand text-2xl pr-1 gradient-blue-font"></i>
+          <i className="bx bxs-magic-wand gradient-blue-font pr-1 text-2xl"></i>
           Add Special Instructions
         </Button>
         <Button className="gradient-blue">
-          <i className="bx bx-cog text-2xl pr-1"></i>Configure
+          <i className="bx bx-cog pr-1 text-2xl"></i>Configure
         </Button>
       </div>
-      <div className="flex flex-wrap justify-start gap-8 mt-16 w-full px-8 lg:p-0 md:w-11/12 xl:w-10/12 mb-8">
+      <div
+        ref={gridRef}
+        className="my-16 flex w-full flex-wrap justify-start gap-8 px-8 md:w-11/12 lg:p-0 xl:w-10/12"
+      >
         {jobGridComponentList}
+      </div>
+      {persistJobGridComponentList.length > 0 ? (
+        <div className="min-h-2 min-w-[80%] rounded-full bg-slate-200"></div>
+      ) : null}
+      <div className="my-16 flex w-full flex-wrap justify-start gap-8 px-8 md:w-11/12 lg:p-0 xl:w-10/12">
+        {persistJobGridComponentList}
       </div>
     </div>
   );
 };
 
-export default page;
+export default Home;

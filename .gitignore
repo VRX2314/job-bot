@@ -6,3 +6,4 @@ temp.*
 temp
 node_modules
 .next
+.prettierrc
