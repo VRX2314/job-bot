@@ -3,7 +3,12 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 
-const DebugMenu = ({ gen }) => {
+interface DebugMenuProps {
+  gen: () => void;
+}
+
+const DebugMenu = ({ gen }: DebugMenuProps) => {
+
   const [debugMenu, setDebugMenu] = useState(false);
   const handleMenu = () => {
     debugMenu ? setDebugMenu(false) : setDebugMenu(true);

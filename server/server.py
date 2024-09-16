@@ -99,7 +99,7 @@ async def stream_json():
 
     for i in data:
         yield json.dumps(i, indent=2)
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.5)
 
 
 @app.get("/stream-test")
