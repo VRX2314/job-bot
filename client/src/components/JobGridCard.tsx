@@ -2,10 +2,8 @@ import React from "react";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 
 import { Button } from "@/components/ui/button";
@@ -62,7 +60,7 @@ const JobGridCard = ({
       </CardHeader>
       <CardContent className="min-h-[516px] px-2 pt-6">
         <div className="flex flex-col gap-0">
-          {/* {Comapny and Designation} */}
+          {/* {Company and Designation} */}
           <p className="gradient-blue-font text-[1rem] font-semibold">
             {company}
           </p>
