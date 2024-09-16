@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/theme-provider";
+import React from "react";
 
 export const metadata = {
   title: "Next.js",
@@ -17,7 +18,7 @@ export default function RootLayout({
         <title>Job Seek V1</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link
-          href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+          href={"https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"}
           rel="stylesheet"
         />
       </head>

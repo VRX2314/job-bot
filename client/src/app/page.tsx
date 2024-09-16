@@ -18,57 +18,9 @@ import {
 import heroImage from "../assets/bot_dummy.png";
 import DebugMenu from "@/components/DebugMenu";
 
+import {JobData, JobDataItem } from "@/app/jobDataInterfaces";
+
 const Home = () => {
-
-  interface JobDataItem {
-    jobCard: React.ReactElement;
-    score: number;
-  }
-
-  interface JobData {
-    response_condenser: string;
-    metadata_condenser: {
-      token_usage: {
-        completion_tokens: number;
-        prompt_tokens: number;
-        total_tokens: number;
-        completion_time: number;
-        prompt_time: number;
-        queue_time: number;
-        total_time: number;
-      };
-      model_name: string;
-      system_fingerprint: string;
-      finish_reason: string;
-      logprobs: null;
-    };
-    response_evaluator: {
-      job_title: string;
-      company: string;
-      score: number;
-      reasons_match: string[];
-      reasons_no_match: string[];
-      reasons_match_c: [];
-      reasons_no_match_c: [];
-    };
-    metadata_evaluator: {
-      token_usage: {
-        completion_tokens: number;
-        prompt_tokens: number;
-        total_tokens: number;
-        completion_time: number;
-        prompt_time: number;
-        queue_time: number;
-        total_time: number;
-      };
-      model_name: string;
-      system_fingerprint: string;
-      finish_reason: string;
-      logprobs: null;
-    };
-    api_calls: number;
-  }
-
   const [jobGridComponentList, setJobGridComponentList] = useState<JobDataItem[]>([]);
 
   const [persistJobGridComponentList, setPersistJobGridComponentList] =
@@ -135,7 +87,6 @@ const Home = () => {
       tempId += 1;
 
       jobDataList.sort((a, b) => b.score - a.score);
-      // const sortedJobGridComponents = jobDataList.map((data) => data.jobCard);
       setJobGridComponentList([...jobDataList]);
     }
   };
