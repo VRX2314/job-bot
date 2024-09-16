@@ -154,7 +154,7 @@ const Home = () => {
             setSelectedOption(value);
           }}
         >
-          <SelectTrigger className="w-[200px] border-slate-300 hover:bg-slate-100">
+          <SelectTrigger className="soft-animate w-[200px] border-slate-300 hover:bg-slate-100">
             <SelectValue placeholder="Select Portal" />
           </SelectTrigger>
           <SelectContent>
@@ -195,13 +195,13 @@ const Home = () => {
         </Select>
         <Input
           type="file"
-          className="w-fit border-slate-300 hover:cursor-pointer hover:bg-slate-100"
+          className="soft-animate w-fit border-slate-300 hover:cursor-pointer hover:bg-slate-100"
         />
-        <Button variant="outline" className="border-slate-300">
+        <Button variant="outline" className="soft-animate border-slate-300">
           <i className="bx bxs-magic-wand gradient-blue-font pr-1 text-2xl"></i>
           Add Special Instructions
         </Button>
-        <Button className="gradient-blue border-0">
+        <Button className="gradient-blue border-0 transition">
           <i className="bx bx-cog pr-1 text-2xl"></i>Configure
         </Button>
       </div>

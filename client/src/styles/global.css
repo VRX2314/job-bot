@@ -7,10 +7,10 @@
     padding: 0;
     box-sizing: border-box;
     font-family: Arial, Helvetica, sans-serif;
-  }
+}
 
 @layer base {
-  :root {
+    :root {
         --background: 0 0% 100%;
         --foreground: 222.2 84% 4.9%;
         --card: 0 0% 100%;
@@ -37,7 +37,8 @@
         --chart-5: 27 87% 67%;
         --radius: 0.5rem;
     }
-  .dark {
+
+    .dark {
         --background: 222.2 84% 4.9%;
         --foreground: 210 40% 98%;
         --card: 222.2 84% 4.9%;
@@ -66,21 +67,35 @@
 }
 
 @layer base {
-  * {
-    @apply border-border;
+    * {
+        @apply border-border;
     }
-  body {
-    @apply bg-background text-foreground;
+
+    body {
+        @apply bg-background text-foreground;
     }
 }
 
 .gradient-blue {
-  background: linear-gradient(255deg, #00D3AD -24.54%, #7003FB 83.13%);
+    background-image: linear-gradient(150deg, rgba(0, 211, 173, 1) 0%, rgba(112, 3, 251, 1) 40%);
+    background-size: 300%;
+    background-position: left;
+    transition: 500ms background-position ease-out;
+}
+
+.gradient-blue:hover {
+    background-position: right;
 }
 
 .gradient-blue-font {
-  background: linear-gradient(255deg, #00D3AD -24.54%, #7003FB 83.13%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+    background: linear-gradient(255deg, #00D3AD -24.54%, #7003FB 83.13%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.soft-animate {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 500ms;
 }
