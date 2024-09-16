@@ -12,16 +12,23 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "@/components/ui/select";
 
-import heroImage from "../assets/bot_dummy.png";
+import heroImage from "@/public/assets/bot_dummy.png";
+import linkedin from "@/public/assets/linkedin.png";
+import glassdoor from "@/public/assets/glassdoor.png";
+import indeed from "@/public/assets/indeed.png";
+
 import DebugMenu from "@/components/DebugMenu";
 
-import {JobData, JobDataItem } from "@/app/jobDataInterfaces";
+import { JobData, JobDataItem } from "@/app/jobDataInterfaces";
+import { motion } from "framer-motion";
 
 const Home = () => {
-  const [jobGridComponentList, setJobGridComponentList] = useState<JobDataItem[]>([]);
+  const [jobGridComponentList, setJobGridComponentList] = useState<
+    JobDataItem[]
+  >([]);
 
   const [persistJobGridComponentList, setPersistJobGridComponentList] =
     useState<JobDataItem[]>([]);
@@ -33,10 +40,9 @@ const Home = () => {
   const gridRef = useRef<HTMLDivElement | null>(null);
 
   const generateResponse = async () => {
-    setPersistJobGridComponentList((prevList) => [
-      ...prevList,
-      ...jobGridComponentList
-    ].sort((a, b) => b.score - a.score));
+    setPersistJobGridComponentList((prevList) =>
+      [...prevList, ...jobGridComponentList].sort((a, b) => b.score - a.score),
+    );
 
     gridRef.current?.scrollIntoView({ behavior: "smooth" });
     let tempId = 0;
@@ -50,7 +56,7 @@ const Home = () => {
 
     const response = await fetch(`http://127.0.0.1:8000/stream-test`, {
       method: "GET",
-      headers: { "Content-Type": "application/json+stream" }
+      headers: { "Content-Type": "application/json+stream" },
     });
 
     if (!response.ok || !response.body) {
@@ -78,10 +84,12 @@ const Home = () => {
             company={jobData.response_evaluator.company}
             score={jobData.response_evaluator.score}
             reasons_match={jobData.response_evaluator.reasons_match_c || []}
-            reasons_no_match={jobData.response_evaluator.reasons_no_match_c || []}
+            reasons_no_match={
+              jobData.response_evaluator.reasons_no_match_c || []
+            }
           />
         ),
-        score: jobData.response_evaluator.score
+        score: jobData.response_evaluator.score,
       });
 
       tempId += 1;
@@ -115,8 +123,7 @@ const Home = () => {
           Job Seeker V1
         </h1>
       </div>
-      <div
-        className="mt-12 flex h-12 items-center justify-center rounded-full border border-slate-300 md:w-11/12 xl:w-7/12 xl:min-w-[1000px]">
+      <div className="mt-12 flex h-12 items-center justify-center rounded-full border border-slate-300 md:w-11/12 xl:w-7/12 xl:min-w-[1000px]">
         <div className="flex h-full w-7/12 flex-row items-center pl-4">
           <i className="bx bx-briefcase-alt gradient-blue-font text-2xl"></i>
           <Input
@@ -147,34 +154,54 @@ const Home = () => {
             setSelectedOption(value);
           }}
         >
-          <SelectTrigger className="w-[200px] border-slate-300">
+          <SelectTrigger className="w-[200px] border-slate-300 hover:bg-slate-100">
             <SelectValue placeholder="Select Portal" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="linkedin">
+            <SelectItem value="linkedin" className="hover:cursor-pointer">
               <div className="flex items-center gap-1">
-                <i className="bx bxl-linkedin-square gradient-blue-font text-2xl"></i>
-                LinkedIn
+                <Image
+                  src={linkedin}
+                  alt={"LinkedIn logo"}
+                  width={16}
+                  height={16}
+                />
+                <p>LinkedIn</p>
               </div>
             </SelectItem>
-            <SelectItem value="indeed">
+            <SelectItem value="indeed" className="hover:cursor-pointer">
               <div className="flex items-center gap-1">
-                <i className="bx bx-cheese text-2xl"></i>Indeed
+                <Image
+                  src={indeed}
+                  alt={"Indeed logo"}
+                  width={16}
+                  height={16}
+                />
+                <p>Indeed</p>
               </div>
             </SelectItem>
-            <SelectItem value="glassdoor">
+            <SelectItem value="glassdoor" className="hover:cursor-pointer">
               <div className="flex items-center gap-1">
-                <i className="bx bx-cheese text-2xl"></i>GlassDoor
+                <Image
+                  src={glassdoor}
+                  alt={"Glass Door logo"}
+                  width={16}
+                  height={16}
+                />
+                <p>GlassDoor</p>
               </div>
             </SelectItem>
           </SelectContent>
         </Select>
-        <Input type="file" className="w-fit border-slate-300" />
+        <Input
+          type="file"
+          className="w-fit border-slate-300 hover:cursor-pointer hover:bg-slate-100"
+        />
         <Button variant="outline" className="border-slate-300">
           <i className="bx bxs-magic-wand gradient-blue-font pr-1 text-2xl"></i>
           Add Special Instructions
         </Button>
-        <Button className="gradient-blue">
+        <Button className="gradient-blue border-0">
           <i className="bx bx-cog pr-1 text-2xl"></i>Configure
         </Button>
       </div>
@@ -187,7 +214,7 @@ const Home = () => {
       {persistJobGridComponentList.length > 0 ? (
         <div className="min-h-2 min-w-[80%] rounded-full bg-slate-200"></div>
       ) : null}
-      <div className="my-16 flex w-full flex-wrap justify-start gap-8 px-8 md:w-11/12 lg:p-0 xl:w-10/12">
+      <div className="my-16 flex w-full flex-wrap items-center justify-start gap-8 px-8 md:w-11/12 lg:p-0 xl:w-10/12">
         {renderJobGridComponents(persistJobGridComponentList)}
       </div>
     </div>
