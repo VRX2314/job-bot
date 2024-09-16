@@ -3,7 +3,7 @@ import "../styles/global.css";
 import JobGridCard from "@/components/JobGridCard";
 import Image from "next/image";
 
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,62 +19,68 @@ import heroImage from "../assets/bot_dummy.png";
 import DebugMenu from "@/components/DebugMenu";
 
 const Home = () => {
+
+  interface JobDataItem {
+    jobCard: React.ReactElement;
+    score: number;
+  }
+
+  interface JobData {
+    response_condenser: string;
+    metadata_condenser: {
+      token_usage: {
+        completion_tokens: number;
+        prompt_tokens: number;
+        total_tokens: number;
+        completion_time: number;
+        prompt_time: number;
+        queue_time: number;
+        total_time: number;
+      };
+      model_name: string;
+      system_fingerprint: string;
+      finish_reason: string;
+      logprobs: null;
+    };
+    response_evaluator: {
+      job_title: string;
+      company: string;
+      score: number;
+      reasons_match: string[];
+      reasons_no_match: string[];
+      reasons_match_c: string[];
+      reasons_no_match_c: string[];
+    };
+    metadata_evaluator: {
+      token_usage: {
+        completion_tokens: number;
+        prompt_tokens: number;
+        total_tokens: number;
+        completion_time: number;
+        prompt_time: number;
+        queue_time: number;
+        total_time: number;
+      };
+      model_name: string;
+      system_fingerprint: string;
+      finish_reason: string;
+      logprobs: null;
+    };
+    api_calls: number;
+  }
+
   const [jobGridComponentList, setJobGridComponentList] = useState<
-    JSX.Element[]
+    React.ReactElement[]
   >([]);
 
   const [persistJobGridComponentList, setPersistJobGridComponentList] =
-    useState<JSX.Element[]>([]);
+    useState<React.ReactElement[]>([]);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
   const [selectedOption, setSelectedOption] = useState("linkedin");
 
   const gridRef = useRef<HTMLDivElement | null>(null);
-
-  let jobData = {
-    response_condensor: "",
-    metadata_condensor: {
-      token_usage: {
-        completion_tokens: 0,
-        prompt_tokens: 0,
-        total_tokens: 0,
-        completion_time: 0,
-        prompt_time: 0,
-        queue_time: 0,
-        total_time: 0,
-      },
-      model_name: "",
-      system_fingerprint: "",
-      finish_reason: "",
-      logprobs: null,
-    },
-    response_evaluator: {
-      job_title: "",
-      company: "",
-      score: 0,
-      reasons_match: [],
-      reasons_no_match: [],
-      reasons_match_c: [],
-      reasons_no_match_c: [],
-    },
-    metadata_evaluator: {
-      token_usage: {
-        completion_tokens: 0,
-        prompt_tokens: 0,
-        total_tokens: 0,
-        completion_time: 0,
-        prompt_time: 0,
-        queue_time: 0,
-        total_time: 0,
-      },
-      model_name: "",
-      system_fingerprint: "",
-      finish_reason: "",
-      logprobs: null,
-    },
-    api_calls: 0,
-  };
 
   const generateResponse = async () => {
     setPersistJobGridComponentList((prevList) => [
@@ -102,7 +108,7 @@ const Home = () => {
 
     const reader = response.body?.getReader();
     const decoder = new TextDecoder();
-    let jobDataList = [];
+    const jobDataList: JobDataItem[] = [];
 
     while (true) {
       const { value, done } = await reader.read();
@@ -111,7 +117,7 @@ const Home = () => {
       }
 
       const decodedChunk = decoder.decode(value, { stream: true });
-      jobData = JSON.parse(decodedChunk);
+      const jobData: JobData = JSON.parse(decodedChunk);
       console.log(jobData);
 
       jobDataList.push({
@@ -121,8 +127,8 @@ const Home = () => {
             title={jobData.response_evaluator.job_title}
             company={jobData.response_evaluator.company}
             score={jobData.response_evaluator.score}
-            reasons_match={jobData.response_evaluator.reasons_match_c}
-            reasons_no_match={jobData.response_evaluator.reasons_no_match_c}
+            reasons_match={jobData.response_evaluator.reasons_match_c || []}
+            reasons_no_match={jobData.response_evaluator.reasons_no_match_c || []}
           />
         ),
         score: jobData.response_evaluator.score,
@@ -131,7 +137,7 @@ const Home = () => {
       tempId += 1;
 
       jobDataList.sort((a, b) => b.score - a.score);
-      let sortedJobGridComponents = jobDataList.map((data) => data.jobCard);
+      const sortedJobGridComponents = jobDataList.map((data) => data.jobCard);
       setJobGridComponentList([...sortedJobGridComponents]);
     }
   };
