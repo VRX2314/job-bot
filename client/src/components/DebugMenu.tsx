@@ -8,7 +8,6 @@ interface DebugMenuProps {
 }
 
 const DebugMenu = ({ gen }: DebugMenuProps) => {
-
   const [debugMenu, setDebugMenu] = useState(false);
   const handleMenu = () => {
     debugMenu ? setDebugMenu(false) : setDebugMenu(true);
@@ -16,7 +15,7 @@ const DebugMenu = ({ gen }: DebugMenuProps) => {
 
   const debugMenuComponent = () => {
     return (
-      <div className="absolute mt-[60px] flex flex-col border-[5px]">
+      <div className="absolute left-2 top-24 flex flex-col border-[5px]">
         Debug Menu
         <Button onClick={gen}>Generate Response</Button>
       </div>
@@ -29,9 +28,9 @@ const DebugMenu = ({ gen }: DebugMenuProps) => {
         variant="outline"
         size="icon"
         onClick={handleMenu}
-        className="absolute bg-red-500"
+        className="absolute left-2 top-12 bg-red-500"
       >
-        <i className="bx bx-cog text-2xl pr-1"></i>
+        <i className="bx bx-cog pr-1 text-2xl"></i>
       </Button>
       {debugMenu ? debugMenuComponent() : null}
     </div>

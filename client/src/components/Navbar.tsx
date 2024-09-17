@@ -17,7 +17,7 @@ import Link from "next/link";
 const Navbar = () => {
   return (
     // Add Link Elements for Each Page
-    <NavigationMenu className="w-full min-w-full border-b justify-center">
+    <NavigationMenu className="absolute w-full min-w-full justify-center border-b">
       <NavigationMenuList>
         <NavigationMenuItem>
           <Link href="/" legacyBehavior passHref>

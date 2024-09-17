@@ -23,7 +23,7 @@ import indeed from "@/public/assets/indeed.png";
 import DebugMenu from "@/components/DebugMenu";
 
 import { JobData, JobDataItem } from "@/app/jobDataInterfaces";
-import { motion } from "framer-motion";
+import ConfigureMenu from "@/components/ConfigureMenu";
 
 const Home = () => {
   const [jobGridComponentList, setJobGridComponentList] = useState<
@@ -36,7 +36,8 @@ const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
   const [selectedOption, setSelectedOption] = useState("linkedin");
-
+  const [apiKey, setApiKey] = useState("");
+  const [configureMenu, setConfigureMenu] = useState(false);
   const gridRef = useRef<HTMLDivElement | null>(null);
 
   const generateResponse = async () => {
@@ -76,6 +77,9 @@ const Home = () => {
       const decodedChunk = decoder.decode(value, { stream: true });
       const jobData: JobData = JSON.parse(decodedChunk);
 
+      console.log(response);
+      console.log(response.statusText);
+
       jobDataList.push({
         jobCard: (
           <JobGridCard
@@ -103,6 +107,10 @@ const Home = () => {
     return component.map((data) => data.jobCard);
   };
 
+  const toggleConfigureMenu = () => {
+    setConfigureMenu(!configureMenu);
+  };
+
   const logger = () => {
     console.log(searchQuery);
     console.log(searchLocation);
@@ -111,19 +119,14 @@ const Home = () => {
   return (
     <div className="flex flex-col items-center justify-center">
       <DebugMenu gen={() => generateResponse()} />
-      <div className="flex w-full max-w-full flex-col items-center justify-center">
-        <Image
-          className="my-4"
-          src={heroImage}
-          width={216}
-          height={216}
-          alt="hero"
-        />
+      <div className="mt-32 flex w-full max-w-full flex-col items-center justify-center">
+        <Image src={heroImage} width={216} height={216} alt="hero" />
         <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
           Job Seeker V1
         </h1>
       </div>
-      <div className="mt-12 flex h-12 items-center justify-center rounded-full border border-slate-300 md:w-11/12 xl:w-7/12 xl:min-w-[1000px]">
+      {/* ------------ Search Component Starts ------------ */}
+      <div className="mt-12 flex h-12 items-center justify-center rounded-lg border border-slate-300 md:w-11/12 xl:w-7/12 xl:min-w-[1000px]">
         <div className="flex h-full w-7/12 flex-row items-center pl-4">
           <i className="bx bx-briefcase-alt gradient-blue-font text-2xl"></i>
           <Input
@@ -141,13 +144,16 @@ const Home = () => {
           />
         </div>
         <Button
-          className="gradient-blue mr-1 self-center rounded-full p-0"
+          className="gradient-blue mr-1 self-center rounded-md p-0"
           onClick={generateResponse}
         >
           <i className="bx bx-search-alt m-2 text-2xl"></i>
         </Button>
       </div>
-      <div className="mt-8 flex max-w-fit flex-col flex-wrap items-center justify-center gap-4 lg:flex-row">
+      {/* ------------ Search Component Ends ------------ */}
+
+      {/* ------------ Configuration Options Starts ------------ */}
+      <div className="my-8 flex max-w-fit flex-col flex-wrap items-center justify-center gap-4 lg:flex-row">
         <Select
           defaultValue={selectedOption}
           onValueChange={(value) => {
@@ -201,23 +207,30 @@ const Home = () => {
           <i className="bx bxs-magic-wand gradient-blue-font pr-1 text-2xl"></i>
           Add Special Instructions
         </Button>
-        <Button className="gradient-blue border-0 transition">
+        <Button
+          className="gradient-blue border-0 transition"
+          onClick={toggleConfigureMenu}
+        >
           <i className="bx bx-cog pr-1 text-2xl"></i>Configure
         </Button>
       </div>
+      {/* ------------ Configuration Options Starts ------------ */}
+      {configureMenu ? <ConfigureMenu /> : null}
+      {/* ------------ JOBS Grid Starts ------------ */}
       <div
         ref={gridRef}
-        className="my-16 flex w-full flex-wrap justify-start gap-8 px-8 md:w-11/12 lg:p-0 xl:w-10/12"
+        className="my-16 flex w-full flex-wrap justify-around gap-8 px-8 md:w-11/12 lg:p-0 xl:w-10/12"
       >
         {renderJobGridComponents(jobGridComponentList)}
       </div>
       {persistJobGridComponentList.length > 0 ? (
         <div className="min-h-2 min-w-[80%] rounded-full bg-slate-200"></div>
       ) : null}
-      <div className="my-16 flex w-full flex-wrap items-center justify-start gap-8 px-8 md:w-11/12 lg:p-0 xl:w-10/12">
+      <div className="my-16 flex w-full flex-wrap items-center justify-around gap-8 px-8 md:w-11/12 lg:p-0 xl:w-10/12">
         {renderJobGridComponents(persistJobGridComponentList)}
       </div>
     </div>
+    /* ------------ JOBS Grid Ends ------------ */
   );
 };
 
