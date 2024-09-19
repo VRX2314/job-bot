@@ -1,6 +1,6 @@
 # ⚠️ Work In Progress
 Current Status
-![Demo.gif](./images/Demo.gif)
+![Demo.gif](./images/Demo.gif "Demo")
 
 ## Job Bot V1
 
