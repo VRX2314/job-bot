@@ -38,6 +38,8 @@ const Home = () => {
   const [selectedOption, setSelectedOption] = useState("linkedin");
   const [apiKey, setApiKey] = useState("");
   const [configureMenu, setConfigureMenu] = useState(false);
+  const [isConfigured, setIsConfigured] = useState(false);
+
   const gridRef = useRef<HTMLDivElement | null>(null);
 
   const generateResponse = async () => {
@@ -122,7 +124,7 @@ const Home = () => {
       <div className="mt-32 flex w-full max-w-full flex-col items-center justify-center">
         <Image src={heroImage} width={216} height={216} alt="hero" />
         <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-          Job Seeker V1
+          Bot Interface V1
         </h1>
       </div>
       {/* ------------ Search Component Starts ------------ */}
@@ -215,7 +217,9 @@ const Home = () => {
         </Button>
       </div>
       {/* ------------ Configuration Options Starts ------------ */}
-      {configureMenu ? <ConfigureMenu /> : null}
+      {configureMenu ? (
+        <ConfigureMenu setIsConfigured={setIsConfigured} />
+      ) : null}
       {/* ------------ JOBS Grid Starts ------------ */}
       <div
         ref={gridRef}

@@ -14,9 +14,20 @@ import { Label } from "@radix-ui/react-menu";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { motion } from "framer-motion";
+import ModelSelectList from "@/components/ModelSelect";
+import { Dispatch, SetStateAction } from "react";
 
-const ConfigureMenu = () => {
+interface ConfigureMenuProps {
+  setIsConfigured: Dispatch<SetStateAction<boolean>>;
+}
+
+const ConfigureMenu = ({ setIsConfigured }: ConfigureMenuProps) => {
   const [selectedOption, setSelectedOption] = useState("groq");
+  const modelBackBone = [
+    "llama-3.1-70b-versatile",
+    "llama-3.1-8b-instant",
+    "gemma2-9b-it",
+  ];
   const [placeHolder, setPlaceHolder] = useState("");
   const [inputType, setInputType] = useState("");
 
@@ -31,6 +42,11 @@ const ConfigureMenu = () => {
     }
   };
 
+  const handleConfigChange = () => {
+    setIsConfigured(true);
+    console.log("Set value");
+  };
+
   useEffect(() => {
     handleSelectedOption(selectedOption);
   });
@@ -42,11 +58,12 @@ const ConfigureMenu = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 1 }}
     >
-      <div className="flex flex-col gap-6 rounded-lg border-2 border-slate-200 p-4 md:w-10/12">
+      <div className="flex flex-col gap-6 rounded-lg border-2 border-slate-200 p-4 md:w-11/12 xl:w-7/12 xl:min-w-[1000px]">
         <div className="flex gap-4">
           <Select
             defaultValue={selectedOption}
             onValueChange={(value) => {
+              handleConfigChange();
               handleSelectedOption(value);
             }}
           >
@@ -77,16 +94,26 @@ const ConfigureMenu = () => {
             className="focus-visible:ring-transparent focus-visible:ring-offset-0"
             type={inputType}
             placeholder={placeHolder}
+            onChange={handleConfigChange}
           />
         </div>
         <div className="flex gap-6">
           <div>
             <Label>Number of Listings</Label>
-            <Input id="listings" type="number" defaultValue={9} />
+            <Input
+              id="listings"
+              type="number"
+              defaultValue={9}
+              onChange={handleConfigChange}
+              required={true}
+            />
           </div>
           <div>
             <Label>Select Model</Label>
-            <Input id="backbone" type="text" />
+            <ModelSelectList
+              modelList={modelBackBone}
+              handleConfigChange={handleConfigChange}
+            />
           </div>
           <div>
             <p>Total API Calls</p>
@@ -108,11 +135,19 @@ const ConfigureMenu = () => {
           </div>
           <div className="flex-grow">
             <Label>LangSmith API</Label>
-            <Input id="langsmit" type="text" placeholder="Optional" />
+            <Input
+              id="langsmit"
+              type="text"
+              placeholder="Optional"
+              onChange={handleConfigChange}
+            />
           </div>
         </div>
         <div>
-          <Textarea placeholder="Enter your custom prompt. Use placeholders {job}, {resume}, {instructions} for data interaction." />
+          <Textarea
+            onChange={handleConfigChange}
+            placeholder="Enter your custom prompt. Use placeholders {job}, {resume}, {instructions} for data interaction."
+          />
         </div>
       </div>
     </motion.div>
