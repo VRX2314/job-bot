@@ -22,13 +22,13 @@ langsmith_key = os.getenv("LANGSMITH_API_KEY")
 
 os.system("export LANGCHAIN_TRACING_V2=true")
 
-model = ChatGroq(
-    model="llama-3.1-70b-versatile",
-    temperature=0,
-    max_tokens=None,
-    timeout=None,
-    max_retries=2,
-)
+# model = ChatGroq(
+#     model="llama-3.1-70b-versatile",
+#     temperature=0,
+#     max_tokens=None,
+#     timeout=None,
+#     max_retries=2,
+# )
 
 client = Client()
 
