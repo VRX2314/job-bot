@@ -7,13 +7,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface ListProps {
-  modelList: string[];
-  handleConfigChange: () => void;
+interface Config {
+  [key: string]: string | number;
 }
 
-const ModelSelectList = ({ modelList, handleConfigChange }: ListProps) => {
-  const [selectedModel, setSelectedModel] = useState("llama-3.1-70b-versatile");
+interface ListProps {
+  modelList: string[];
+  handleConfigChange: (key: string, value: string | number) => void;
+  configuration: Config;
+}
+
+const ModelSelectList = ({
+  modelList,
+  handleConfigChange,
+  configuration,
+}: ListProps) => {
+  const [selectedModel, setSelectedModel] = useState(
+    configuration["modelBackBone"],
+  );
 
   const generateList = modelList.map((element, index) => {
     return (
@@ -30,7 +41,7 @@ const ModelSelectList = ({ modelList, handleConfigChange }: ListProps) => {
       <Select
         defaultValue={selectedModel}
         onValueChange={(value) => {
-          handleConfigChange();
+          handleConfigChange("modelBackBone", value);
           setSelectedModel(value);
         }}
       >

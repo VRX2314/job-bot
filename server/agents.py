@@ -73,7 +73,7 @@ class CondensorEvaluatorGraph:
                     json.dumps(evaluated_information.response_metadata, indent=2)
                 ),
                 "api_calls": CondensorEvaluatorGraph.api_calls,
-            }  # Give Camel Case names
+            }  # TODO Give Camel Case names
 
         except Exception as e:
             print("PARSER ERROR\n")

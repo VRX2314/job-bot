@@ -36,9 +36,17 @@ const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
   const [selectedOption, setSelectedOption] = useState("linkedin");
-  const [apiKey, setApiKey] = useState("");
-  const [configureMenu, setConfigureMenu] = useState(false);
+  const [configureMenu, setConfigureMenu] = useState(true);
   const [isConfigured, setIsConfigured] = useState(false);
+  const [config, setConfig] = useState<{ [key: string]: string | number }>({
+    inferenceEngine: "groq",
+    apiKey: "",
+    modelBackbone: "",
+    numListings: 100,
+    langsmithKey: "",
+    modelBackBone: "llama-3.1-70b-versatile",
+    customPrompt: "",
+  });
 
   const gridRef = useRef<HTMLDivElement | null>(null);
 
@@ -47,20 +55,37 @@ const Home = () => {
       [...prevList, ...jobGridComponentList].sort((a, b) => b.score - a.score),
     );
 
+    if (isConfigured) {
+      const response = await fetch(
+        `http://127.0.0.1:8000/setup-params-groq?api_key=${config["apiKey"]}&model_backbone=${config["modelBackBone"]}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json+stream" },
+        },
+      );
+      setIsConfigured(false);
+
+      if (!response.ok || !response.body) {
+        throw response.statusText;
+      }
+
+      console.log(response.body);
+    }
+
     gridRef.current?.scrollIntoView({ behavior: "smooth" });
     let tempId = 0;
-    // const response = await fetch(
-    //   `http://127.0.0.1:8000/stream-llm-hybrid?query=${searchQuery}&location=${searchLocation}`,
-    //   {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json+stream" },
-    //   },
-    // );
+    const response = await fetch(
+      `http://127.0.0.1:8000/stream-llm-hybrid?query=${searchQuery}&location=${searchLocation}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json+stream" },
+      },
+    );
 
-    const response = await fetch(`http://127.0.0.1:8000/stream-test`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json+stream" },
-    });
+    // const response = await fetch(`http://127.0.0.1:8000/stream-test`, {
+    //   method: "GET",
+    //   headers: { "Content-Type": "application/json+stream" },
+    // });
 
     if (!response.ok || !response.body) {
       throw response.statusText;
@@ -218,7 +243,11 @@ const Home = () => {
       </div>
       {/* ------------ Configuration Options Starts ------------ */}
       {configureMenu ? (
-        <ConfigureMenu setIsConfigured={setIsConfigured} />
+        <ConfigureMenu
+          setIsConfigured={setIsConfigured}
+          configuration={config}
+          setConfiguration={setConfig}
+        />
       ) : null}
       {/* ------------ JOBS Grid Starts ------------ */}
       <div

@@ -17,12 +17,35 @@ import { motion } from "framer-motion";
 import ModelSelectList from "@/components/ModelSelect";
 import { Dispatch, SetStateAction } from "react";
 
-interface ConfigureMenuProps {
-  setIsConfigured: Dispatch<SetStateAction<boolean>>;
+interface Config {
+  [key: string]: string | number;
 }
 
-const ConfigureMenu = ({ setIsConfigured }: ConfigureMenuProps) => {
-  const [selectedOption, setSelectedOption] = useState("groq");
+interface ConfigureMenuProps {
+  setIsConfigured: Dispatch<SetStateAction<boolean>>;
+  configuration: Config;
+  setConfiguration: Dispatch<
+    SetStateAction<{ [key: string]: string | number }>
+  >;
+}
+
+const ConfigureMenu = ({
+  setIsConfigured,
+  configuration,
+  setConfiguration,
+}: ConfigureMenuProps) => {
+  const [selectedOption, setSelectedOption] = useState(
+    configuration["inferenceEngine"],
+  );
+  const [apiKey, setApiKey] = useState(configuration["apiKey"]);
+  const [numListings, setNumListings] = useState(configuration["numListings"]);
+  const [langsmithKey, setLangsmithKey] = useState(
+    configuration["langsmithKey"],
+  );
+  const [customPrompt, setCustomPrompt] = useState(
+    configuration["customPrompt"],
+  );
+
   const modelBackBone = [
     "llama-3.1-70b-versatile",
     "llama-3.1-8b-instant",
@@ -42,9 +65,9 @@ const ConfigureMenu = ({ setIsConfigured }: ConfigureMenuProps) => {
     }
   };
 
-  const handleConfigChange = () => {
+  const handleConfigChange = (key: string, value: string | number) => {
     setIsConfigured(true);
-    console.log("Set value");
+    setConfiguration((prev) => ({ ...prev, [key]: value }));
   };
 
   useEffect(() => {
@@ -58,12 +81,12 @@ const ConfigureMenu = ({ setIsConfigured }: ConfigureMenuProps) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 1 }}
     >
-      <div className="flex flex-col gap-6 rounded-lg border-2 border-slate-200 p-4 md:w-11/12 xl:w-7/12 xl:min-w-[1000px]">
+      <div className="flex flex-col gap-6 rounded-lg border-2 border-slate-100 p-4 md:w-11/12 xl:w-7/12 xl:min-w-[1000px]">
         <div className="flex gap-4">
           <Select
             defaultValue={selectedOption}
             onValueChange={(value) => {
-              handleConfigChange();
+              handleConfigChange("inferenceEngine", value);
               handleSelectedOption(value);
             }}
           >
@@ -94,7 +117,11 @@ const ConfigureMenu = ({ setIsConfigured }: ConfigureMenuProps) => {
             className="focus-visible:ring-transparent focus-visible:ring-offset-0"
             type={inputType}
             placeholder={placeHolder}
-            onChange={handleConfigChange}
+            value={apiKey}
+            onChange={(e) => {
+              handleConfigChange("apiKey", e.target.value);
+              setApiKey(e.target.value);
+            }}
           />
         </div>
         <div className="flex gap-6">
@@ -103,8 +130,12 @@ const ConfigureMenu = ({ setIsConfigured }: ConfigureMenuProps) => {
             <Input
               id="listings"
               type="number"
-              defaultValue={9}
-              onChange={handleConfigChange}
+              defaultValue={numListings}
+              onChange={(e) => {
+                handleConfigChange("numListings", e.target.value);
+                setNumListings(e.target.value);
+              }}
+              min={1}
               required={true}
             />
           </div>
@@ -112,6 +143,7 @@ const ConfigureMenu = ({ setIsConfigured }: ConfigureMenuProps) => {
             <Label>Select Model</Label>
             <ModelSelectList
               modelList={modelBackBone}
+              configuration={configuration}
               handleConfigChange={handleConfigChange}
             />
           </div>
@@ -136,16 +168,24 @@ const ConfigureMenu = ({ setIsConfigured }: ConfigureMenuProps) => {
           <div className="flex-grow">
             <Label>LangSmith API</Label>
             <Input
-              id="langsmit"
+              id="langsmith"
               type="text"
               placeholder="Optional"
-              onChange={handleConfigChange}
+              value={langsmithKey}
+              onChange={(e) => {
+                handleConfigChange("langsmithKey", e.target.value);
+                setLangsmithKey(e.target.value);
+              }}
             />
           </div>
         </div>
         <div>
           <Textarea
-            onChange={handleConfigChange}
+            value={customPrompt}
+            onChange={(e) => {
+              handleConfigChange("customPrompt", e.target.value);
+              setCustomPrompt(e.target.value);
+            }}
             placeholder="Enter your custom prompt. Use placeholders {job}, {resume}, {instructions} for data interaction."
           />
         </div>

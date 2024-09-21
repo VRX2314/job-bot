@@ -22,13 +22,13 @@ langsmith_key = os.getenv("LANGSMITH_API_KEY")
 
 os.system("export LANGCHAIN_TRACING_V2=true")
 
-model = ChatGroq(
-    model="llama-3.1-70b-versatile",
-    temperature=0,
-    max_tokens=None,
-    timeout=None,
-    max_retries=2,
-)
+# model = ChatGroq(
+#     model="llama-3.1-70b-versatile",
+#     temperature=0,
+#     max_tokens=None,
+#     timeout=None,
+#     max_retries=2,
+# )
 
 client = Client()
 
@@ -60,32 +60,36 @@ async def stream_llm():
     return StreamingResponse(crawler.scrape(), media_type="text/event-stream")
 
 
-# @app.get("/stream-llm-hybrid")
-# async def stream_llm_hybrid():
-#     config_path = "./config/config.json"
-#     if os.path.exists(config_path):
-#         with open(config_path, "r") as file:
-#             config = json.load(file)
-#         print("Config loaded:", config)
-#     else:
-#         print(f"Config file {config_path} does not exist.")
-#     crawler = LLMCrawler(config, model, temporary_resume())
+@app.post("/setup-params-groq")
+async def set_params_groq(
+    api_key: str = groq_key, model_backbone: str = "llama-3.1-70b-versatile"
+):
+    global model
+    model = ChatGroq(
+        model=model_backbone,
+        temperature=0,
+        max_tokens=None,
+        timeout=None,
+        max_retries=2,
+        api_key=api_key,
+    )
 
-#     return StreamingResponse(
-#         crawler.scrape(hybrid=True), media_type="text/event-stream"
-#     )
+    return {
+        "model": model.model_name,
+        "temperature": model.temperature,
+        "max_tokens": model.max_tokens,
+        "api": model.groq_api_key,
+    }
+
+
+@app.post("/setup-params-ollama")
+async def set_params_ollama():
+    pass
 
 
 @app.post("/stream-llm-hybrid")
 async def stream_llm_hybrid(query: str, location: str):
-    config_path = "./config/config.json"
-    if os.path.exists(config_path):
-        with open(config_path, "r") as file:
-            config = json.load(file)
-        print("Config loaded:", config)
-    else:
-        print(f"Config file {config_path} does not exist.")
-    crawler = LLMCrawler(config, query, location, model, temporary_resume())
+    crawler = LLMCrawler(query, location, model, temporary_resume())
 
     return StreamingResponse(
         crawler.scrape(hybrid=True), media_type="text/event-stream"

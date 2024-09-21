@@ -1,13 +1,14 @@
 from datetime import datetime
 
 
+#! Scraper Branch
 class Crawler:
-    def __init__(self, config, query, location):
+    def __init__(self, query, location):
         self.browser = None
         self.page = None
 
         self.query = query
-        self.pages = config["pages"]
+        self.pages = 1  # TODO Make Dynamic
         self.location = location
 
         self.today = datetime.today().date()
@@ -25,14 +26,6 @@ class Crawler:
     async def _load_browser(self, p):
         self.browser = await p.chromium.launch(headless=False)
         self.page = await self.browser.new_page()
-
-        # # Block unnecessary resources
-        # await self.page.route(
-        #     "**/*",
-        #     lambda route, request: route.continue_()
-        #     if request.resource_type in ["document", "script", "xhr", "fetch"]
-        #     else route.abort(),
-        # )
 
     async def scrape_indeed(self, job) -> dict:
         await job.click(timeout=30000)
