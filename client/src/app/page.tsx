@@ -74,18 +74,18 @@ const Home = () => {
 
     gridRef.current?.scrollIntoView({ behavior: "smooth" });
     let tempId = 0;
-    // const response = await fetch(
-    //   `http://127.0.0.1:8000/stream-llm-hybrid?query=${searchQuery}&location=${searchLocation}`,
-    //   {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json+stream" },
-    //   },
-    // );
+    const response = await fetch(
+      `http://127.0.0.1:8000/stream-llm-hybrid?query=${searchQuery}&location=${searchLocation}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json+stream" },
+      },
+    );
 
-    const response = await fetch(`http://127.0.0.1:8000/stream-test`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json+stream" },
-    });
+    // const response = await fetch(`http://127.0.0.1:8000/stream-test`, {
+    //   method: "GET",
+    //   headers: { "Content-Type": "application/json+stream" },
+    // });
 
     if (!response.ok || !response.body) {
       throw response.statusText;
