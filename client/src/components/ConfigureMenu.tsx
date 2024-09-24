@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { motion } from "framer-motion";
 import ModelSelectList from "@/components/ModelSelect";
 import { Dispatch, SetStateAction } from "react";
+import { setCookie, getCookie } from "cookies-next";
 
 interface Config {
   [key: string]: string | number;
@@ -35,9 +36,9 @@ const ConfigureMenu = ({
   setConfiguration,
 }: ConfigureMenuProps) => {
   const [selectedOption, setSelectedOption] = useState(
-    configuration["inferenceEngine"],
+    configuration["inferenceEngine"].toString(),
   );
-  const [apiKey, setApiKey] = useState(configuration["apiKey"]);
+  const [apiKey, setApiKey] = useState(configuration["apiKey"].toString());
   const [numListings, setNumListings] = useState(configuration["numListings"]);
   const [langsmithKey, setLangsmithKey] = useState(
     configuration["langsmithKey"],
@@ -55,6 +56,7 @@ const ConfigureMenu = ({
   const [inputType, setInputType] = useState("");
 
   const handleSelectedOption = (value: string) => {
+    setApiKey("");
     setSelectedOption(value);
     if (value === "groq") {
       setPlaceHolder("Enter your Groq API Key");
@@ -67,12 +69,20 @@ const ConfigureMenu = ({
 
   const handleConfigChange = (key: string, value: string | number) => {
     setIsConfigured(true);
+    if (key === "apiKey") {
+      setCookie("apiKey", value);
+    }
+
     setConfiguration((prev) => ({ ...prev, [key]: value }));
   };
 
   useEffect(() => {
     handleSelectedOption(selectedOption);
-  });
+
+    if (getCookie("apiKey")) {
+      setApiKey(getCookie("apiKey"));
+    }
+  }, []);
 
   return (
     <motion.div

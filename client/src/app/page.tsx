@@ -57,10 +57,12 @@ const Home = () => {
 
     if (isConfigured) {
       const response = await fetch(
-        `http://127.0.0.1:8000/setup-params-groq?api_key=${config["apiKey"]}&model_backbone=${config["modelBackBone"]}`,
+        `http://127.0.0.1:8000/setup-params-groq?model_backbone=${config["modelBackBone"]}`,
         {
           method: "POST",
+          credentials: "include",
           headers: { "Content-Type": "application/json+stream" },
+          body: JSON.stringify({ api_key: config["apiKey"] }),
         },
       );
       setIsConfigured(false);
@@ -69,7 +71,7 @@ const Home = () => {
         throw response.statusText;
       }
 
-      console.log(response.body);
+      console.log(await response.json());
     }
 
     gridRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -104,8 +106,8 @@ const Home = () => {
       const decodedChunk = decoder.decode(value, { stream: true });
       const jobData: JobData = JSON.parse(decodedChunk);
 
-      console.log(response);
-      console.log(response.statusText);
+      // console.log(response);
+      // console.log(response.statusText);
 
       jobDataList.push({
         jobCard: (
@@ -147,7 +149,6 @@ const Home = () => {
     <div className="flex flex-col items-center justify-center">
       <DebugMenu gen={() => generateResponse()} />
       <div className="mt-32 flex w-full max-w-full flex-col items-center justify-center">
-        <Image src={heroImage} width={216} height={216} alt="hero" />
         <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
           Bot Interface V1
         </h1>

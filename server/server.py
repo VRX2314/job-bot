@@ -1,5 +1,5 @@
-from fastapi import FastAPI
-
+from fastapi import FastAPI, Body
+from typing import Union
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -13,7 +13,6 @@ import os
 from dotenv import load_dotenv
 import json
 import asyncio
-
 
 load_dotenv()
 
@@ -35,7 +34,7 @@ client = Client()
 app = FastAPI()
 
 # To connect to front end
-origins = ["http://localhost:3000"]
+origins = ["http://localhost:3000", "http://localhost:8000"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -62,9 +61,10 @@ async def stream_llm():
 
 @app.post("/setup-params-groq")
 async def set_params_groq(
-    api_key: str = groq_key, model_backbone: str = "llama-3.1-70b-versatile"
+        api_key: Union[str, None] = Body(...), model_backbone: str = "llama-3.1-70b-versatile"
 ):
     global model
+    api_key = json.loads(api_key)["api_key"]
     model = ChatGroq(
         model=model_backbone,
         temperature=0,
@@ -78,7 +78,7 @@ async def set_params_groq(
         "model": model.model_name,
         "temperature": model.temperature,
         "max_tokens": model.max_tokens,
-        "api": model.groq_api_key,
+        "api": api_key,
     }
 
 
