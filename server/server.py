@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, Body, File, UploadFile
 from typing import Union
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,20 +14,16 @@ from dotenv import load_dotenv
 import json
 import asyncio
 
+import pymupdf
+import re
+
 load_dotenv()
 
 groq_key = os.getenv("GROQ_API_KEY")
 langsmith_key = os.getenv("LANGSMITH_API_KEY")
-
 os.system("export LANGCHAIN_TRACING_V2=true")
 
-# model = ChatGroq(
-#     model="llama-3.1-70b-versatile",
-#     temperature=0,
-#     max_tokens=None,
-#     timeout=None,
-#     max_retries=2,
-# )
+resume = """"""
 
 client = Client()
 
@@ -44,6 +40,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+model = ChatGroq(
+    model="llama-3.1-70b-versatile",
+    temperature=0,
+    max_tokens=None,
+    timeout=None,
+    max_retries=2,
+)
+
 
 @app.get("/stream-llm")
 async def stream_llm():
@@ -54,7 +58,7 @@ async def stream_llm():
         print("Config loaded:", config)
     else:
         print(f"Config file {config_path} does not exist.")
-    crawler = LLMCrawler(config, model, temporary_resume())
+    crawler = LLMCrawler(config, model, resume)
 
     return StreamingResponse(crawler.scrape(), media_type="text/event-stream")
 
@@ -89,11 +93,16 @@ async def set_params_ollama():
 
 @app.post("/stream-llm-hybrid")
 async def stream_llm_hybrid(query: str, location: str):
-    crawler = LLMCrawler(query, location, model, temporary_resume())
+    crawler = LLMCrawler(query, location, model, resume)
 
     return StreamingResponse(
         crawler.scrape(hybrid=True), media_type="text/event-stream"
     )
+
+@app.get("/get-model-params")
+async def hybrid_params():
+    crawler = LLMCrawler("", "", model, resume)
+    return {"prompt": crawler.hybrid.system_prompt}
 
 
 async def stream_json():
@@ -110,3 +119,23 @@ async def stream_json():
 async def stream_test():
     # return StreamingResponse(stream_json(), media_type="application/stream+json")
     return StreamingResponse(stream_json(), media_type="text/event-stream")
+
+@app.post("/upload-resume")
+async def upload_resume(file: UploadFile = File(...)):
+    try:
+        contents = await file.read()
+        with pymupdf.open(stream=contents, filetype="pdf") as doc:
+            text = ""
+            for page in doc:
+                text += page.get_text()
+
+        processed_text = re.sub(r'[^a-zA-Z0-9\n\.\,\-\s]', ' ', text)
+        processed_text = re.sub(r'\n+', '\n', processed_text)
+
+        global resume
+        resume = processed_text
+
+        return {"success": file.filename, "text": processed_text}
+
+    except Exception as e:
+        return {"error": str(e)}

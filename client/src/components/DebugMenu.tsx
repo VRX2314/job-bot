@@ -13,11 +13,20 @@ const DebugMenu = ({ gen }: DebugMenuProps) => {
     debugMenu ? setDebugMenu(false) : setDebugMenu(true);
   };
 
+  const loadParams = async () => {
+    const response = await fetch("http://127.0.0.1:8000/get-model-params", {
+      method: "GET",
+    });
+
+    console.log(await response.json());
+  };
+
   const debugMenuComponent = () => {
     return (
       <div className="absolute left-2 top-24 flex flex-col border-[5px]">
         Debug Menu
         <Button onClick={gen}>Generate Response</Button>
+        <Button onClick={loadParams}>Show Params</Button>
       </div>
     );
   };

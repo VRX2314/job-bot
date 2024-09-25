@@ -80,7 +80,7 @@ const ConfigureMenu = ({
     handleSelectedOption(selectedOption);
 
     if (getCookie("apiKey")) {
-      setApiKey(getCookie("apiKey"));
+      setApiKey(getCookie("apiKey") || "");
     }
   }, []);
 

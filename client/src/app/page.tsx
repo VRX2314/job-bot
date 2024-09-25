@@ -42,7 +42,7 @@ const Home = () => {
     inferenceEngine: "groq",
     apiKey: "",
     modelBackbone: "",
-    numListings: 100,
+    numListings: 9,
     langsmithKey: "",
     modelBackBone: "llama-3.1-70b-versatile",
     customPrompt: "",
@@ -76,18 +76,18 @@ const Home = () => {
 
     gridRef.current?.scrollIntoView({ behavior: "smooth" });
     let tempId = 0;
-    const response = await fetch(
-      `http://127.0.0.1:8000/stream-llm-hybrid?query=${searchQuery}&location=${searchLocation}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json+stream" },
-      },
-    );
+    // const response = await fetch(
+    //   `http://127.0.0.1:8000/stream-llm-hybrid?query=${searchQuery}&location=${searchLocation}`,
+    //   {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json+stream" },
+    //   },
+    // );
 
-    // const response = await fetch(`http://127.0.0.1:8000/stream-test`, {
-    //   method: "GET",
-    //   headers: { "Content-Type": "application/json+stream" },
-    // });
+    const response = await fetch(`http://127.0.0.1:8000/stream-test`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json+stream" },
+    });
 
     if (!response.ok || !response.body) {
       throw response.statusText;
@@ -105,9 +105,6 @@ const Home = () => {
 
       const decodedChunk = decoder.decode(value, { stream: true });
       const jobData: JobData = JSON.parse(decodedChunk);
-
-      // console.log(response);
-      // console.log(response.statusText);
 
       jobDataList.push({
         jobCard: (
@@ -140,9 +137,18 @@ const Home = () => {
     setConfigureMenu(!configureMenu);
   };
 
-  const logger = () => {
-    console.log(searchQuery);
-    console.log(searchLocation);
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files[0] || null;
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await fetch("http://127.0.0.1:8000/upload-resume/", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await response.json();
+    console.log(data);
   };
 
   return (
@@ -230,6 +236,8 @@ const Home = () => {
         <Input
           type="file"
           className="soft-animate w-fit border-slate-300 hover:cursor-pointer hover:bg-slate-100"
+          accept=".pdf"
+          onChange={handleFileUpload}
         />
         <Button variant="outline" className="soft-animate border-slate-300">
           <i className="bx bxs-magic-wand gradient-blue-font pr-1 text-2xl"></i>
@@ -243,13 +251,13 @@ const Home = () => {
         </Button>
       </div>
       {/* ------------ Configuration Options Starts ------------ */}
-      {configureMenu ? (
+      {configureMenu && (
         <ConfigureMenu
           setIsConfigured={setIsConfigured}
           configuration={config}
           setConfiguration={setConfig}
         />
-      ) : null}
+      )}
       {/* ------------ JOBS Grid Starts ------------ */}
       <div
         ref={gridRef}

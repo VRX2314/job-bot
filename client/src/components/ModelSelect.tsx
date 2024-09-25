@@ -39,7 +39,7 @@ const ModelSelectList = ({
   return (
     <div>
       <Select
-        defaultValue={selectedModel}
+        defaultValue={selectedModel.toString()}
         onValueChange={(value) => {
           handleConfigChange("modelBackBone", value);
           setSelectedModel(value);
