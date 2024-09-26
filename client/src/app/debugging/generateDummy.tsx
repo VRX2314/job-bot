@@ -24,6 +24,8 @@ export const generateDummyResponse = async (
         body: JSON.stringify({ api_key: config["apiKey"] }),
       },
     );
+
+    console.log("isConfigured:", isConfigured);
     setIsConfigured(false);
 
     if (!response.ok || !response.body) {

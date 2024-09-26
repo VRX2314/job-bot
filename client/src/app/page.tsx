@@ -70,8 +70,6 @@ const Home = () => {
       if (!response.ok || !response.body) {
         throw response.statusText;
       }
-
-      console.log(await response.json());
     }
 
     gridRef.current?.scrollIntoView({ behavior: "smooth" });

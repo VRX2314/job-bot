@@ -81,6 +81,10 @@ const ConfigureMenu = ({
 
     if (getCookie("apiKey")) {
       setApiKey(getCookie("apiKey") || "");
+      setConfiguration((prev) => ({
+        ...prev,
+        ["apiKey"]: getCookie("apiKey") || "",
+      }));
     }
   }, []);
 

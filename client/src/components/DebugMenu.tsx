@@ -31,15 +31,16 @@ const DebugMenu = ({ genResp }: DebugMenuProps) => {
     );
   };
 
+  // The Red Button
   return (
     <div className="self-start">
       <Button
         variant="outline"
         size="icon"
         onClick={handleMenu}
-        className="absolute left-2 top-12 bg-red-500"
+        className="absolute left-2 top-12 m-0 bg-red-500 p-0 text-center"
       >
-        <i className="bx bx-cog pr-1 text-2xl"></i>
+        <i className="bx bx-cog text-2xl"></i>
       </Button>
       {debugMenu ? debugMenuComponent() : null}
     </div>
