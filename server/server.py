@@ -102,7 +102,7 @@ async def stream_llm_hybrid(query: str, location: str):
 @app.get("/get-model-params")
 async def hybrid_params():
     crawler = LLMCrawler("", "", model, resume)
-    return {"prompt": crawler.hybrid.system_prompt}
+    return {"prompt": str(crawler.hybrid.system_prompt)}
 
 
 async def stream_json():
@@ -129,8 +129,7 @@ async def upload_resume(file: UploadFile = File(...)):
             for page in doc:
                 text += page.get_text()
 
-        processed_text = re.sub(r'[^a-zA-Z0-9\n\.\,\-\s]', ' ', text)
-        processed_text = re.sub(r'\n+', '\n', processed_text)
+        processed_text = re.sub(r'\n{2,}|\s*•\s*|\s*\(\w+\)\s*|\s*-\s*', '', text)
 
         global resume
         resume = processed_text
