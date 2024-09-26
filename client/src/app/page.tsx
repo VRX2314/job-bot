@@ -15,12 +15,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import heroImage from "@/public/assets/bot_dummy.png";
 import linkedin from "@/public/assets/linkedin.png";
 import glassdoor from "@/public/assets/glassdoor.png";
 import indeed from "@/public/assets/indeed.png";
 
 import DebugMenu from "@/components/DebugMenu";
+import { generateDummyResponse } from "@/app/debugging/generateDummy";
 
 import { JobData, JobDataItem } from "@/app/jobDataInterfaces";
 import ConfigureMenu from "@/components/ConfigureMenu";
@@ -37,7 +37,7 @@ const Home = () => {
   const [searchLocation, setSearchLocation] = useState("");
   const [selectedOption, setSelectedOption] = useState("linkedin");
   const [configureMenu, setConfigureMenu] = useState(true);
-  const [isConfigured, setIsConfigured] = useState(false);
+  const [isConfigured, setIsConfigured] = useState(true);
   const [config, setConfig] = useState<{ [key: string]: string | number }>({
     inferenceEngine: "groq",
     apiKey: "",
@@ -76,18 +76,14 @@ const Home = () => {
 
     gridRef.current?.scrollIntoView({ behavior: "smooth" });
     let tempId = 0;
-    // const response = await fetch(
-    //   `http://127.0.0.1:8000/stream-llm-hybrid?query=${searchQuery}&location=${searchLocation}`,
-    //   {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json+stream" },
-    //   },
-    // );
 
-    const response = await fetch(`http://127.0.0.1:8000/stream-test`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json+stream" },
-    });
+    const response = await fetch(
+      `http://127.0.0.1:8000/stream-llm-hybrid?query=${searchQuery}&location=${searchLocation}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json+stream" },
+      },
+    );
 
     if (!response.ok || !response.body) {
       throw response.statusText;
@@ -153,7 +149,18 @@ const Home = () => {
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <DebugMenu gen={() => generateResponse()} />
+      <DebugMenu
+        genResp={() =>
+          generateDummyResponse(
+            jobGridComponentList,
+            setJobGridComponentList,
+            setPersistJobGridComponentList,
+            config,
+            isConfigured,
+            setIsConfigured,
+          )
+        }
+      />
       <div className="mt-32 flex w-full max-w-full flex-col items-center justify-center">
         <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
           Bot Interface V1

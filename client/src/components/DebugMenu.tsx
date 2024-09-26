@@ -4,10 +4,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 interface DebugMenuProps {
-  gen: () => void;
+  genResp: () => Promise<void>;
 }
 
-const DebugMenu = ({ gen }: DebugMenuProps) => {
+const DebugMenu = ({ genResp }: DebugMenuProps) => {
   const [debugMenu, setDebugMenu] = useState(false);
   const handleMenu = () => {
     debugMenu ? setDebugMenu(false) : setDebugMenu(true);
@@ -23,9 +23,9 @@ const DebugMenu = ({ gen }: DebugMenuProps) => {
 
   const debugMenuComponent = () => {
     return (
-      <div className="absolute left-2 top-24 flex flex-col border-[5px]">
+      <div className="absolute left-2 top-24 flex flex-col gap-2 border-[5px]">
         Debug Menu
-        <Button onClick={gen}>Generate Response</Button>
+        <Button onClick={genResp}>Generate Response</Button>
         <Button onClick={loadParams}>Show Params</Button>
       </div>
     );
