@@ -24,6 +24,7 @@ import { generateDummyResponse } from "@/app/debugging/generateDummy";
 
 import { JobData, JobDataItem } from "@/app/jobDataInterfaces";
 import ConfigureMenu from "@/components/ConfigureMenu";
+import { prefixes } from "next/dist/build/output/log";
 
 const Home = () => {
   const [jobGridComponentList, setJobGridComponentList] = useState<
@@ -47,6 +48,9 @@ const Home = () => {
     modelBackBone: "llama-3.1-70b-versatile",
     customPrompt: "",
   });
+
+  const [apiCalls, setApiCalls] = useState(0);
+  const [tokenUsage, setTokenUsage] = useState(0);
 
   const gridRef = useRef<HTMLDivElement | null>(null);
 
@@ -120,6 +124,11 @@ const Home = () => {
 
       jobDataList.sort((a, b) => b.score - a.score);
       setJobGridComponentList([...jobDataList]);
+      setApiCalls((prevCalls) => (prevCalls += 1));
+      setTokenUsage(
+        (prevTokens) =>
+          (prevTokens += jobData.metadata_evaluator.token_usage.total_tokens),
+      );
     }
   };
 
@@ -156,6 +165,8 @@ const Home = () => {
             config,
             isConfigured,
             setIsConfigured,
+            setApiCalls,
+            setTokenUsage,
           )
         }
       />
@@ -261,6 +272,8 @@ const Home = () => {
           setIsConfigured={setIsConfigured}
           configuration={config}
           setConfiguration={setConfig}
+          apiCalls={apiCalls}
+          tokenUsage={tokenUsage}
         />
       )}
       {/* ------------ JOBS Grid Starts ------------ */}

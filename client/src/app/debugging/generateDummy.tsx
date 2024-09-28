@@ -9,6 +9,8 @@ export const generateDummyResponse = async (
   config: { [key: string]: string | number },
   isConfigured: boolean,
   setIsConfigured: Dispatch<SetStateAction<boolean>>,
+  setApiCalls: Dispatch<SetStateAction<number>>,
+  setTokenUsage: Dispatch<SetStateAction<number>>,
 ) => {
   setPersistJobGridComponentList((prevList) =>
     [...prevList, ...jobGridComponentList].sort((a, b) => b.score - a.score),
@@ -73,7 +75,11 @@ export const generateDummyResponse = async (
     });
 
     tempId += 1;
-
+    setApiCalls((prevCalls) => (prevCalls += 1));
+    setTokenUsage(
+      (prevTokens) =>
+        (prevTokens += jobData.metadata_evaluator.token_usage.total_tokens),
+    );
     jobDataList.sort((a, b) => b.score - a.score);
     setJobGridComponentList([...jobDataList]);
   }
