@@ -132,7 +132,7 @@ const Home = () => {
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files[0] || null;
+    const file = e.target.files![0];
     const formData = new FormData();
     formData.append("file", file);
 
