@@ -25,6 +25,7 @@ import { generateDummyResponse } from "@/app/debugging/generateDummy";
 import { JobData, JobDataItem } from "@/app/jobDataInterfaces";
 import ConfigureMenu from "@/components/ConfigureMenu";
 import { prefixes } from "next/dist/build/output/log";
+import SpecialMenu from "@/components/SpecialMenu";
 
 const Home = () => {
   const [jobGridComponentList, setJobGridComponentList] = useState<
@@ -38,6 +39,7 @@ const Home = () => {
   const [searchLocation, setSearchLocation] = useState("");
   const [selectedOption, setSelectedOption] = useState("linkedin");
   const [configureMenu, setConfigureMenu] = useState(true);
+  const [specialMenu, setSpecialMenu] = useState(false);
   const [isConfigured, setIsConfigured] = useState(true);
   const [config, setConfig] = useState<{ [key: string]: string | number }>({
     inferenceEngine: "groq",
@@ -136,8 +138,13 @@ const Home = () => {
     return component.map((data) => data.jobCard);
   };
 
-  const toggleConfigureMenu = () => {
-    setConfigureMenu(!configureMenu);
+  const toggleMenu = (id: number) => {
+    if (id === 1) {
+      setConfigureMenu(!configureMenu);
+    }
+    if (id === 2) {
+      setSpecialMenu(!specialMenu);
+    }
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -255,13 +262,17 @@ const Home = () => {
           accept=".pdf"
           onChange={handleFileUpload}
         />
-        <Button variant="outline" className="soft-animate border-slate-300">
+        <Button
+          variant="outline"
+          className="soft-animate border-slate-300"
+          onClick={() => toggleMenu(2)}
+        >
           <i className="bx bxs-magic-wand gradient-blue-font pr-1 text-2xl"></i>
           Add Special Instructions
         </Button>
         <Button
           className="gradient-blue border-0 transition"
-          onClick={toggleConfigureMenu}
+          onClick={() => toggleMenu(1)}
         >
           <i className="bx bx-cog pr-1 text-2xl"></i>Configure
         </Button>
@@ -276,6 +287,10 @@ const Home = () => {
           tokenUsage={tokenUsage}
         />
       )}
+
+      {/* ------------ Special Menu Starts Here ------------ */}
+      {specialMenu && <SpecialMenu />}
+
       {/* ------------ JOBS Grid Starts ------------ */}
       <div
         ref={gridRef}
