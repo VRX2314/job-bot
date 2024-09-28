@@ -42,7 +42,7 @@ const Home = () => {
     inferenceEngine: "groq",
     apiKey: "",
     modelBackbone: "",
-    numListings: 9,
+    numListings: 1,
     langsmithKey: "",
     modelBackBone: "llama-3.1-70b-versatile",
     customPrompt: "",
@@ -76,7 +76,7 @@ const Home = () => {
     let tempId = 0;
 
     const response = await fetch(
-      `http://127.0.0.1:8000/stream-llm-hybrid?query=${searchQuery}&location=${searchLocation}`,
+      `http://127.0.0.1:8000/stream-llm-hybrid?query=${searchQuery}&location=${searchLocation}&listings=${config["numListings"]}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json+stream" },
