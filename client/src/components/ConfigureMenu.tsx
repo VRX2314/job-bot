@@ -28,12 +28,16 @@ interface ConfigureMenuProps {
   setConfiguration: Dispatch<
     SetStateAction<{ [key: string]: string | number }>
   >;
+  apiCalls: number;
+  tokenUsage: number;
 }
 
 const ConfigureMenu = ({
   setIsConfigured,
   configuration,
   setConfiguration,
+  apiCalls,
+  tokenUsage,
 }: ConfigureMenuProps) => {
   const [selectedOption, setSelectedOption] = useState(
     configuration["inferenceEngine"].toString(),
@@ -167,7 +171,7 @@ const ConfigureMenu = ({
               variant="outline"
               className="soft-animate w-full border-slate-200"
             >
-              Calls
+              {apiCalls}
             </Button>
           </div>
           <div>
@@ -176,7 +180,7 @@ const ConfigureMenu = ({
               variant="outline"
               className="soft-animate w-full border-slate-200"
             >
-              10000
+              {tokenUsage}
             </Button>
           </div>
           <div className="flex-grow">

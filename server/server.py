@@ -92,8 +92,8 @@ async def set_params_ollama():
 
 
 @app.post("/stream-llm-hybrid")
-async def stream_llm_hybrid(query: str, location: str):
-    crawler = LLMCrawler(query, location, model, resume)
+async def stream_llm_hybrid(query: str, location: str, listings: int = 1):
+    crawler = LLMCrawler(query, location, listings, model, resume)
 
     return StreamingResponse(
         crawler.scrape(hybrid=True), media_type="text/event-stream"

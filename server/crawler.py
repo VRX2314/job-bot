@@ -3,12 +3,12 @@ from datetime import datetime
 
 #! Scraper Branch
 class Crawler:
-    def __init__(self, query, location):
+    def __init__(self, query, location, listings):
         self.browser = None
         self.page = None
 
         self.query = query
-        self.pages = 1  # TODO Make Dynamic
+        self.listings = listings  # TODO Make Dynamic
         self.location = location
 
         self.today = datetime.today().date()

@@ -24,6 +24,7 @@ import { generateDummyResponse } from "@/app/debugging/generateDummy";
 
 import { JobData, JobDataItem } from "@/app/jobDataInterfaces";
 import ConfigureMenu from "@/components/ConfigureMenu";
+import { prefixes } from "next/dist/build/output/log";
 
 const Home = () => {
   const [jobGridComponentList, setJobGridComponentList] = useState<
@@ -42,11 +43,14 @@ const Home = () => {
     inferenceEngine: "groq",
     apiKey: "",
     modelBackbone: "",
-    numListings: 9,
+    numListings: 1,
     langsmithKey: "",
     modelBackBone: "llama-3.1-70b-versatile",
     customPrompt: "",
   });
+
+  const [apiCalls, setApiCalls] = useState(0);
+  const [tokenUsage, setTokenUsage] = useState(0);
 
   const gridRef = useRef<HTMLDivElement | null>(null);
 
@@ -76,7 +80,7 @@ const Home = () => {
     let tempId = 0;
 
     const response = await fetch(
-      `http://127.0.0.1:8000/stream-llm-hybrid?query=${searchQuery}&location=${searchLocation}`,
+      `http://127.0.0.1:8000/stream-llm-hybrid?query=${searchQuery}&location=${searchLocation}&listings=${config["numListings"]}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json+stream" },
@@ -120,6 +124,11 @@ const Home = () => {
 
       jobDataList.sort((a, b) => b.score - a.score);
       setJobGridComponentList([...jobDataList]);
+      setApiCalls((prevCalls) => (prevCalls += 1));
+      setTokenUsage(
+        (prevTokens) =>
+          (prevTokens += jobData.metadata_evaluator.token_usage.total_tokens),
+      );
     }
   };
 
@@ -132,7 +141,7 @@ const Home = () => {
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files[0] || null;
+    const file = e.target.files![0];
     const formData = new FormData();
     formData.append("file", file);
 
@@ -156,6 +165,8 @@ const Home = () => {
             config,
             isConfigured,
             setIsConfigured,
+            setApiCalls,
+            setTokenUsage,
           )
         }
       />
@@ -261,6 +272,8 @@ const Home = () => {
           setIsConfigured={setIsConfigured}
           configuration={config}
           setConfiguration={setConfig}
+          apiCalls={apiCalls}
+          tokenUsage={tokenUsage}
         />
       )}
       {/* ------------ JOBS Grid Starts ------------ */}

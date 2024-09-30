@@ -12,12 +12,14 @@ A fullstack Generative AI project that uses LLMs and Web Scraping to find the mo
 - [x] Complete UI
 - [ ] Make UI Responsive
 - [x] Improve Scraper Speed
-- [ ] Connect Configuration Frontend to Backend
+- [x] Connect Configuration Frontend to Backend
 - [ ] Langgraph Migration 
+- [ ] Parallel Scraping
+- [ ] MongoDB Integration
 
 ### Repository Branches
 
-- shadcdn-ui - Primary Branch for UI Development
+- shadcn-ui - Primary Branch for UI Development
 - scraper - Branch for scraper development and updates
 - api - Branch for backend API development and integration
 - master - Main branch

@@ -1,4 +1,4 @@
-def condesnor_prompt_v1() -> str:
+def condenser_prompt_v1() -> str:
     return """You will receive inputs containing a Job Title, Company Name, and Job Description. Your task is to condense the Job Description by extracting and preserving the most relevant information that is critical for determining candidate suitability.
 
 Instructions:
@@ -59,7 +59,7 @@ When stating reasons, the reasons should be in first person perspective to the c
     )
 
 
-def condensor_evaluator_hybrid_prompt_v1(resume: str = "None Provided") -> str:
+def condenser_evaluator_hybrid_prompt_v1(resume: str = "None Provided") -> str:
     return """You are an advanced AI model designed to evaluate candidate resumes against job postings. You will receive two sets of inputs:
 
 Job Posting Data:
