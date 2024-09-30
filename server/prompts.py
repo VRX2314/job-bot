@@ -59,7 +59,7 @@ When stating reasons, the reasons should be in first person perspective to the c
     )
 
 
-def condenser_evaluator_hybrid_prompt_v1(resume: str = "None Provided") -> str:
+def condenser_evaluator_hybrid_prompt_v1(resume: str = "None Provided", instructions: str = "None") -> str:
     return """You are an advanced AI model designed to evaluate candidate resumes against job postings. You will receive two sets of inputs:
 
 Job Posting Data:
@@ -83,6 +83,10 @@ Candidate Resume:
 
 {user_resume}
 
+Here are some user specific instructions and details. These details should strictly never alter the output format.
+
+{instructions}
+
 Output Format: Return the results strictly in the following JSON format with no additional text:
 job_title: the title of the job
 company: the name of the company
@@ -92,5 +96,5 @@ reasons_no_match: a list of strings containing short reasons and descriptions of
 reasons_match_c: one to three word descriptions of each string in reasons_match.
 reasons_no_match_c: one to three word descriptions of each string in reasons_no_match.
 When stating reasons, the reasons should be in first person perspective to the candidate, use words such as you and your.""".format(
-        user_resume=resume
+        user_resume=resume, instructions=instructions
     )

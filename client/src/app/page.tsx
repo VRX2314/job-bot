@@ -24,7 +24,6 @@ import { generateDummyResponse } from "@/app/debugging/generateDummy";
 
 import { JobData, JobDataItem } from "@/app/jobDataInterfaces";
 import ConfigureMenu from "@/components/ConfigureMenu";
-import { prefixes } from "next/dist/build/output/log";
 import SpecialMenu from "@/components/SpecialMenu";
 
 const Home = () => {

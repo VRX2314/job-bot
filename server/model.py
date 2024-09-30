@@ -42,7 +42,7 @@ class LLMCrawler(Crawler):
                         response = self.condenser_evaluator_graph.execute_graph(
                             f"{scraped_job}"
                         )
-
+                    # TODO: Handle Gemma ```json ... ```
                     yield f"{response}"
 
                     # Adding randomness to avoid bot-detection
