@@ -1,7 +1,7 @@
 import numpy as np
 
 from crawler import Crawler
-from agents import CondensorAgent, EvaluatorAgent, CondensorEvaluatorGraph, HybridAgent
+from agents import CondenserAgent, EvaluatorAgent, CondenserEvaluatorGraph, HybridAgent
 from playwright.async_api import async_playwright
 from warnings import filterwarnings
 
@@ -10,19 +10,14 @@ from temp import temporary_resume
 from langchain_groq import ChatGroq
 import asyncio
 
-from tqdm import tqdm
-filterwarnings('ignore')
-
-
-
 class LLMCrawler(Crawler):
-    def __init__(self, query, location, model, resume):
-        super().__init__(query, location)
-        self.condensor = CondensorAgent(model)
+    def __init__(self, query, location, listings,  model, resume):
+        super().__init__(query, location, listings)
+        self.condenser = CondenserAgent(model)
         self.evaluator = EvaluatorAgent(model, resume)
         self.hybrid = HybridAgent(model, resume)
-        self.condensor_evaluator_graph = CondensorEvaluatorGraph(
-            self.condensor, self.evaluator, self.hybrid
+        self.condenser_evaluator_graph = CondenserEvaluatorGraph(
+            self.condenser, self.evaluator, self.hybrid
         )
 
     async def scrape(self, hybrid: bool = True):
@@ -30,32 +25,32 @@ class LLMCrawler(Crawler):
             ctx = 0
             await self._load_browser(p)
             await self._load_page()
-            
-            len_listings = 3
 
-            while len_listings != ctx:
+            # TODO: Refactor with better logic
+            while self.listings != ctx:
                 job_elements = await self.page.query_selector_all(
                     ".jobTitle.css-198pbd.eu4oa1w0"
                 )
                 
-                for job in tqdm(job_elements):
+                for job in job_elements:
                     scraped_job = await self.scrape_indeed(job)
                     if hybrid:
-                        response = self.condensor_evaluator_graph.execute_hybrid_graph(
+                        response = self.condenser_evaluator_graph.execute_hybrid_graph(
                             f"{scraped_job}"
                         )
                     else:
-                        response = self.condensor_evaluator_graph.execute_graph(
+                        response = self.condenser_evaluator_graph.execute_graph(
                             f"{scraped_job}"
                         )
-                    # ctx += 1
-                    # if ctx > 2:
-                    #     break
+
                     yield f"{response}"
-                    await asyncio.sleep(np.random.choice(np.arange(1,3, 0.5)))
+
+                    # Adding randomness to avoid bot-detection
+                    await asyncio.sleep(np.random.choice(np.arange(1,3, 0.01)))
+
                     ctx += 1
-                    if len_listings == ctx:
-                        print(len_listings)
+                    if self.listings == ctx:
+                        print(self.listings)
                         break
 
                 next_button = await self.page.query_selector(
