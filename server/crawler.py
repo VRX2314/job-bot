@@ -64,4 +64,5 @@ class Crawler:
             "Company": company_name,
             "Location": location,
             "Description": job_description,
+            "Link": self.page.url
         }

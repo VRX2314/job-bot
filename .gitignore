@@ -8,3 +8,4 @@ node_modules
 .next
 .prettierrc
 .idea
+test.py
