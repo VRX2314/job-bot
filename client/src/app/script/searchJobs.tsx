@@ -1,14 +1,17 @@
-import { JobData, JobDataItem } from "@/app/script/jobDataInterfaces";
-import React, { Dispatch, SetStateAction } from "react";
 import JobGridCard from "@/components/JobGridCard";
+import { JobData, JobDataItem } from "@/app/script/jobDataInterfaces";
+import { Dispatch, MutableRefObject, SetStateAction } from "react";
 
-export const generateDummyResponse = async (
+const generateResponse = async (
+  searchQuery: string,
+  searchLocation: string,
   jobGridComponentList: JobDataItem[],
   setJobGridComponentList: Dispatch<SetStateAction<JobDataItem[]>>,
   setPersistJobGridComponentList: Dispatch<SetStateAction<JobDataItem[]>>,
   config: { [key: string]: string | number },
   isConfigured: boolean,
   setIsConfigured: Dispatch<SetStateAction<boolean>>,
+  gridRef: MutableRefObject<HTMLDivElement | null>,
   setApiCalls: Dispatch<SetStateAction<number>>,
   setTokenUsage: Dispatch<SetStateAction<number>>,
 ) => {
@@ -26,22 +29,23 @@ export const generateDummyResponse = async (
         body: JSON.stringify({ api_key: config["apiKey"] }),
       },
     );
-
-    console.log("isConfigured:", isConfigured);
     setIsConfigured(false);
 
     if (!response.ok || !response.body) {
       throw response.statusText;
     }
-
-    console.log(await response.json());
   }
 
+  gridRef.current?.scrollIntoView({ behavior: "smooth" });
   let tempId = 0;
-  const response = await fetch(`http://127.0.0.1:8000/stream-test`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json+stream" },
-  });
+
+  const response = await fetch(
+    `http://127.0.0.1:8000/stream-llm-hybrid?query=${searchQuery}&location=${searchLocation}&listings=${config["numListings"]}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json+stream" },
+    },
+  );
 
   if (!response.ok || !response.body) {
     throw response.statusText;
@@ -75,12 +79,15 @@ export const generateDummyResponse = async (
     });
 
     tempId += 1;
+
+    jobDataList.sort((a, b) => b.score - a.score);
+    setJobGridComponentList([...jobDataList]);
     setApiCalls((prevCalls) => (prevCalls += 1));
     setTokenUsage(
       (prevTokens) =>
         (prevTokens += jobData.metadata_evaluator.token_usage.total_tokens),
     );
-    jobDataList.sort((a, b) => b.score - a.score);
-    setJobGridComponentList([...jobDataList]);
   }
 };
+
+export default generateResponse;
