@@ -1,6 +1,5 @@
 "use client";
 import "../styles/global.css";
-import JobGridCard from "@/components/JobGridCard";
 import Image from "next/image";
 
 import React, { useState, useRef } from "react";
@@ -22,17 +21,20 @@ import indeed from "@/public/assets/indeed.png";
 import DebugMenu from "@/components/DebugMenu";
 import { generateDummyResponse } from "@/app/debugging/generateDummy";
 
-import { JobData, JobDataItem } from "@/app/script/jobDataInterfaces";
 import ConfigureMenu from "@/components/ConfigureMenu";
 import SpecialMenu from "@/components/SpecialMenu";
 
-import generateResponse from "@/app/script/searchJobs";
+import { JobDataItem } from "@/app/script/jobDataInterfaces";
+import {
+  generateResponse,
+  handleFileUpload,
+  renderJobGridComponents,
+} from "@/app/script/jobUtils";
 
 const Home = () => {
   const [jobGridComponentList, setJobGridComponentList] = useState<
     JobDataItem[]
   >([]);
-
   const [persistJobGridComponentList, setPersistJobGridComponentList] =
     useState<JobDataItem[]>([]);
 
@@ -57,10 +59,6 @@ const Home = () => {
 
   const gridRef = useRef<HTMLDivElement | null>(null);
 
-  const renderJobGridComponents = (component: JobDataItem[]) => {
-    return component.map((data) => data.jobCard);
-  };
-
   const toggleMenu = (id: number) => {
     if (id === 1) {
       setConfigureMenu(!configureMenu);
@@ -68,20 +66,6 @@ const Home = () => {
     if (id === 2) {
       setSpecialMenu(!specialMenu);
     }
-  };
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files![0];
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const response = await fetch("http://127.0.0.1:8000/upload-resume/", {
-      method: "POST",
-      body: formData,
-    });
-
-    const data = await response.json();
-    console.log(data);
   };
 
   return (

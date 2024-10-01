@@ -1,6 +1,6 @@
 import JobGridCard from "@/components/JobGridCard";
 import { JobData, JobDataItem } from "@/app/script/jobDataInterfaces";
-import { Dispatch, MutableRefObject, SetStateAction } from "react";
+import React, { Dispatch, MutableRefObject, SetStateAction } from "react";
 
 const generateResponse = async (
   searchQuery: string,
@@ -90,4 +90,22 @@ const generateResponse = async (
   }
 };
 
-export default generateResponse;
+const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files![0];
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await fetch("http://127.0.0.1:8000/upload-resume/", {
+    method: "POST",
+    body: formData,
+  });
+
+  const data = await response.json();
+  console.log(data);
+};
+
+const renderJobGridComponents = (component: JobDataItem[]) => {
+  return component.map((data) => data.jobCard);
+};
+
+export { generateResponse, handleFileUpload, renderJobGridComponents };
