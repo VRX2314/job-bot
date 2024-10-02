@@ -1,6 +1,5 @@
 "use client";
 import "../styles/global.css";
-import JobGridCard from "@/components/JobGridCard";
 import Image from "next/image";
 
 import React, { useState, useRef } from "react";
@@ -22,15 +21,20 @@ import indeed from "@/public/assets/indeed.png";
 import DebugMenu from "@/components/DebugMenu";
 import { generateDummyResponse } from "@/app/debugging/generateDummy";
 
-import { JobData, JobDataItem } from "@/app/jobDataInterfaces";
 import ConfigureMenu from "@/components/ConfigureMenu";
 import SpecialMenu from "@/components/SpecialMenu";
+
+import { JobDataItem } from "@/app/script/jobDataInterfaces";
+import {
+  generateResponse,
+  handleFileUpload,
+  renderJobGridComponents,
+} from "@/app/script/jobUtils";
 
 const Home = () => {
   const [jobGridComponentList, setJobGridComponentList] = useState<
     JobDataItem[]
   >([]);
-
   const [persistJobGridComponentList, setPersistJobGridComponentList] =
     useState<JobDataItem[]>([]);
 
@@ -55,88 +59,6 @@ const Home = () => {
 
   const gridRef = useRef<HTMLDivElement | null>(null);
 
-  const generateResponse = async () => {
-    setPersistJobGridComponentList((prevList) =>
-      [...prevList, ...jobGridComponentList].sort((a, b) => b.score - a.score),
-    );
-
-    if (isConfigured) {
-      const response = await fetch(
-        `http://127.0.0.1:8000/setup-params-groq?model_backbone=${config["modelBackBone"]}`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json+stream" },
-          body: JSON.stringify({ api_key: config["apiKey"] }),
-        },
-      );
-      setIsConfigured(false);
-
-      if (!response.ok || !response.body) {
-        throw response.statusText;
-      }
-    }
-
-    gridRef.current?.scrollIntoView({ behavior: "smooth" });
-    let tempId = 0;
-
-    const response = await fetch(
-      `http://127.0.0.1:8000/stream-llm-hybrid?query=${searchQuery}&location=${searchLocation}&listings=${config["numListings"]}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json+stream" },
-      },
-    );
-
-    if (!response.ok || !response.body) {
-      throw response.statusText;
-    }
-
-    const reader = response.body?.getReader();
-    const decoder = new TextDecoder();
-    const jobDataList: JobDataItem[] = [];
-
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) {
-        break;
-      }
-
-      const decodedChunk = decoder.decode(value, { stream: true });
-      const jobData: JobData = JSON.parse(decodedChunk);
-
-      jobDataList.push({
-        jobCard: (
-          <JobGridCard
-            key={tempId}
-            title={jobData.response_evaluator.job_title}
-            company={jobData.response_evaluator.company}
-            score={jobData.response_evaluator.score}
-            reasons_match={jobData.response_evaluator.reasons_match_c || []}
-            reasons_no_match={
-              jobData.response_evaluator.reasons_no_match_c || []
-            }
-          />
-        ),
-        score: jobData.response_evaluator.score,
-      });
-
-      tempId += 1;
-
-      jobDataList.sort((a, b) => b.score - a.score);
-      setJobGridComponentList([...jobDataList]);
-      setApiCalls((prevCalls) => (prevCalls += 1));
-      setTokenUsage(
-        (prevTokens) =>
-          (prevTokens += jobData.metadata_evaluator.token_usage.total_tokens),
-      );
-    }
-  };
-
-  const renderJobGridComponents = (component: JobDataItem[]) => {
-    return component.map((data) => data.jobCard);
-  };
-
   const toggleMenu = (id: number) => {
     if (id === 1) {
       setConfigureMenu(!configureMenu);
@@ -144,20 +66,6 @@ const Home = () => {
     if (id === 2) {
       setSpecialMenu(!specialMenu);
     }
-  };
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files![0];
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const response = await fetch("http://127.0.0.1:8000/upload-resume/", {
-      method: "POST",
-      body: formData,
-    });
-
-    const data = await response.json();
-    console.log(data);
   };
 
   return (
@@ -201,7 +109,21 @@ const Home = () => {
         </div>
         <Button
           className="gradient-blue mr-1 self-center rounded-md p-0"
-          onClick={generateResponse}
+          onClick={() =>
+            generateResponse(
+              searchQuery,
+              searchLocation,
+              jobGridComponentList,
+              setJobGridComponentList,
+              setPersistJobGridComponentList,
+              config,
+              isConfigured,
+              setIsConfigured,
+              gridRef,
+              setApiCalls,
+              setTokenUsage,
+            )
+          }
         >
           <i className="bx bx-search-alt m-2 text-2xl"></i>
         </Button>
