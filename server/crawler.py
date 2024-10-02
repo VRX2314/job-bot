@@ -1,4 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+
+import re
 
 
 #! Scraper Branch
@@ -12,6 +14,18 @@ class Crawler:
         self.location = location
 
         self.today = datetime.today().date()
+        
+    def convert_posting_time(self,posting_time_str):
+    # Check if the posting time contains "Just posted"
+        if "Just posted" in posting_time_str:
+            return datetime.now().strftime("%Y-%m-%d")  # Return today's date
+        
+        # Use regex to find the number of days ago
+        match = re.search(r'Posted (\d+) days ago', posting_time_str)
+        if match:
+            days_ago = int(match.group(1))  # Extract the number of days
+            posting_date = datetime.now() - timedelta(days=days_ago)  # Subtract days from current date
+            return posting_date.strftime("%Y-%m-%d")  #
 
     async def _load_page(self):
         await self.page.goto("https://in.indeed.com/")
@@ -58,11 +72,16 @@ class Crawler:
             if job_description_element
             else None
         )
+        
+        posting_time_element = await self.page.query_selector('span[data-testid="myJobsStateDate"]')
+        posting_time_str = await posting_time_element.inner_text() if posting_time_element else "N/A"
+        posting_date  = self.convert_posting_time(posting_time_str=posting_time_str)
 
         return {
             "Title": job_title,
             "Company": company_name,
             "Location": location,
             "Description": job_description,
-            "Link": self.page.url
+            "Link": self.page.url,
+            "Posting Date": posting_date
         }
