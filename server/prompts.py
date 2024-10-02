@@ -58,7 +58,7 @@ When stating reasons, the reasons should be in first person perspective to the c
         user_resume=resume
     )
 
-
+# Removed job_title and company to reduce token payload
 def condenser_evaluator_hybrid_prompt_v1(resume: str = "None Provided", instructions: str = "None") -> str:
     return """You are an advanced AI model designed to evaluate candidate resumes against job postings. You will receive two sets of inputs:
 
@@ -88,13 +88,11 @@ Here are some user specific instructions and details. These details should stric
 {instructions}
 
 Output Format: Return the results strictly in the following JSON format with no additional text:
-job_title: the title of the job
-company: the name of the company
-score: the calculated suitability score, should in range of 0 to 1
-reasons_match: a list of strings containing short reasons and descriptions of why candidate is a good fit and should apply. This field should have at max 5 strings.
-reasons_no_match: a list of strings containing short reasons and descriptions of why candidate is not a good fit and should apply. This field should have at max 5 strings.
-reasons_match_c: one to three word descriptions of each string in reasons_match.
-reasons_no_match_c: one to three word descriptions of each string in reasons_no_match.
+score: The calculated suitability score, should in range of 0 to 1
+reasons_match: A list of strings containing short reasons and descriptions of why candidate is a good fit and should apply. This field should have at max 5 strings.
+reasons_no_match: A list of strings containing short reasons and descriptions of why candidate is not a good fit and should apply. This field should have at max 5 strings.
+reasons_match_c: One to three word descriptions of each string in reasons_match.
+reasons_no_match_c: One to three word descriptions of each string in reasons_no_match.
 When stating reasons, the reasons should be in first person perspective to the candidate, use words such as you and your.""".format(
         user_resume=resume, instructions=instructions
-    )
+)

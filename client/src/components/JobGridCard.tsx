@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 interface CardProps {
   title: string;
@@ -16,6 +17,7 @@ interface CardProps {
   score: number;
   reasons_match: [];
   reasons_no_match: [];
+  apply_link: string;
 }
 
 const JobGridCard = ({
@@ -24,6 +26,7 @@ const JobGridCard = ({
   score,
   reasons_match,
   reasons_no_match,
+  apply_link,
 }: CardProps) => {
   const scoreFactor = score * 120;
   const pillComponents = (reasons: [], flag: boolean) => {
@@ -86,9 +89,14 @@ const JobGridCard = ({
           </div>
         </CardContent>
         <CardFooter className="m-0 my-2 flex flex-row gap-4 p-0 px-2">
-          <Button className="gradient-blue w-full transition duration-300 hover:scale-105">
-            <i className="bx bx-link-external pr-1 text-2xl"></i>
-            <p className="font-bold">Apply Now</p>
+          <Button
+            asChild
+            className="gradient-blue w-full transition duration-300 hover:scale-105"
+          >
+            <Link href={apply_link}>
+              <i className="bx bx-link-external pr-1 text-2xl"></i>
+              <p className="font-bold">Apply Now</p>
+            </Link>
           </Button>
           <Button
             variant="outline"

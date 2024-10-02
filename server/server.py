@@ -23,7 +23,8 @@ groq_key = os.getenv("GROQ_API_KEY")
 langsmith_key = os.getenv("LANGSMITH_API_KEY")
 os.system("export LANGCHAIN_TRACING_V2=true")
 
-resume = """"""
+# NOTE: For testing purposes
+resume = temporary_resume()
 
 client = Client()
 
@@ -106,7 +107,7 @@ async def hybrid_params():
 
 
 async def stream_json():
-    with open("./temp/hybrid.json") as json_data:
+    with open("./temp/hybrid_new.json") as json_data:
         data = json.load(json_data)
         json_data.close()
 

@@ -1,12 +1,10 @@
+import json
 import numpy as np
-
 from crawler import Crawler
 from agents import CondenserAgent, EvaluatorAgent, CondenserEvaluatorGraph, HybridAgent
 from playwright.async_api import async_playwright
 from warnings import filterwarnings
-
 from temp import temporary_resume
-
 from langchain_groq import ChatGroq
 import asyncio
 
@@ -38,19 +36,29 @@ class LLMCrawler(Crawler):
                         response = self.condenser_evaluator_graph.execute_hybrid_graph(
                             f"{scraped_job}"
                         )
+
+                        # Adding job_title, company, link to scraped response
+                        response["job_title"] = scraped_job["Title"][:scraped_job["Title"].index("\n")]
+                        response["company"] = scraped_job["Company"]
+                        response["link"] = scraped_job["Link"]
                     else:
                         response = self.condenser_evaluator_graph.execute_graph(
                             f"{scraped_job}"
                         )
+
+                        # Adding job_title, company, link to scraped response
+                        response["job_title"] = scraped_job["Title"][:scraped_job["Title"].index("\n")]
+                        response["company"] = scraped_job["Company"]
+                        response["link"] = scraped_job["Link"]
+
                     # TODO: Handle Gemma ```json ... ```
-                    yield f"{response}"
+                    yield json.dumps(response, indent=2) # Needs to be yielded as string for streaming
 
                     # Adding randomness to avoid bot-detection
                     await asyncio.sleep(np.random.choice(np.arange(1,3, 0.01)))
 
                     ctx += 1
                     if self.listings == ctx:
-                        print(self.listings)
                         break
 
                 next_button = await self.page.query_selector(

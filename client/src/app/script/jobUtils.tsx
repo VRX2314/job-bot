@@ -62,17 +62,21 @@ const generateResponse = async (
     }
 
     const decodedChunk = decoder.decode(value, { stream: true });
-    const jobData: JobData = JSON.parse(decodedChunk);
 
+    // String is parsed to JSON here
+    console.log(decodedChunk);
+    const jobData: JobData = JSON.parse(decodedChunk);
+    console.log(jobData);
     jobDataList.push({
       jobCard: (
         <JobGridCard
           key={tempId}
-          title={jobData.response_evaluator.job_title}
-          company={jobData.response_evaluator.company}
+          title={jobData.job_title}
+          company={jobData.company}
           score={jobData.response_evaluator.score}
           reasons_match={jobData.response_evaluator.reasons_match_c || []}
           reasons_no_match={jobData.response_evaluator.reasons_no_match_c || []}
+          apply_link={jobData.link}
         />
       ),
       score: jobData.response_evaluator.score,

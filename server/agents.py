@@ -81,6 +81,7 @@ class CondenserEvaluatorGraph:
     def execute_hybrid_graph(self, prompt: str) -> dict:
         evaluated_information = self.hybrid.generate_response(prompt)
         CondenserEvaluatorGraph.api_calls += 1
+        evaluated_json = {}
 
         try:
             evaluated_json = {
@@ -95,4 +96,4 @@ class CondenserEvaluatorGraph:
             print("PARSER ERROR\n")
             print(e)
 
-        return json.dumps(evaluated_json, indent=2)
+        return evaluated_json # Type: Dict

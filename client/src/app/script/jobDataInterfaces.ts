@@ -6,6 +6,9 @@ export interface JobDataItem {
 }
 
 export interface JobData {
+  job_title: string;
+  company: string;
+  link: string;
   response_condenser: string;
   metadata_condenser: {
     token_usage: {
@@ -23,8 +26,6 @@ export interface JobData {
     logprobs: null;
   };
   response_evaluator: {
-    job_title: string;
-    company: string;
     score: number;
     reasons_match: string[];
     reasons_no_match: string[];
