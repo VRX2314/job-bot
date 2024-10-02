@@ -25,7 +25,7 @@ class Crawler:
         if match:
             days_ago = int(match.group(1))  # Extract the number of days
             posting_date = datetime.now() - timedelta(days=days_ago)  # Subtract days from current date
-            return posting_date.strftime("%Y-%m-%d")  #
+            return posting_date.strftime("%d-%m-%Y")  #
 
     async def _load_page(self):
         await self.page.goto("https://in.indeed.com/")
@@ -83,5 +83,5 @@ class Crawler:
             "Location": location,
             "Description": job_description,
             "Link": self.page.url,
-            "Posting Date": posting_date
+            "Date": posting_date
         }

@@ -9,6 +9,7 @@ export interface JobData {
   job_title: string;
   company: string;
   link: string;
+  date: string;
   response_condenser: string;
   metadata_condenser: {
     token_usage: {

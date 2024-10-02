@@ -77,6 +77,7 @@ const generateResponse = async (
           reasons_match={jobData.response_evaluator.reasons_match_c || []}
           reasons_no_match={jobData.response_evaluator.reasons_no_match_c || []}
           apply_link={jobData.link}
+          date={jobData.date}
         />
       ),
       score: jobData.response_evaluator.score,

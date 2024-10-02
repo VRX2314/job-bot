@@ -18,6 +18,7 @@ interface CardProps {
   reasons_match: [];
   reasons_no_match: [];
   apply_link: string;
+  date: string;
 }
 
 const JobGridCard = ({
@@ -27,6 +28,7 @@ const JobGridCard = ({
   reasons_match,
   reasons_no_match,
   apply_link,
+  date,
 }: CardProps) => {
   const scoreFactor = score * 120;
   const pillComponents = (reasons: [], flag: boolean) => {
@@ -77,7 +79,7 @@ const JobGridCard = ({
           </p>
           <div className="mt-2 flex">
             <i className="bx bx-calendar gradient-blue-font pr-1 text-xl"></i>
-            <p>02/10/2024</p>
+            <p>{date}</p>
           </div>
         </CardHeader>
         <CardContent className="">

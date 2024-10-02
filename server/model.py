@@ -41,6 +41,7 @@ class LLMCrawler(Crawler):
                         response["job_title"] = scraped_job["Title"][:scraped_job["Title"].index("\n")]
                         response["company"] = scraped_job["Company"]
                         response["link"] = scraped_job["Link"]
+                        response["date"] = scraped_job["Date"]
                     else:
                         response = self.condenser_evaluator_graph.execute_graph(
                             f"{scraped_job}"
@@ -50,6 +51,7 @@ class LLMCrawler(Crawler):
                         response["job_title"] = scraped_job["Title"][:scraped_job["Title"].index("\n")]
                         response["company"] = scraped_job["Company"]
                         response["link"] = scraped_job["Link"]
+                        response["date"] = scraped_job["Date"]
 
                     # TODO: Handle Gemma ```json ... ```
                     yield json.dumps(response, indent=2) # Needs to be yielded as string for streaming
