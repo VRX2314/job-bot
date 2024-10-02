@@ -40,7 +40,7 @@ const JobGridCard = ({
     const pills = reasons.map((reason, index) => (
       <div
         key={index}
-        className={`text-sm font-semibold ${pillColor} rounded-full border px-4 py-2`}
+        className={`text-sm font-semibold ${pillColor} rounded-2xl border px-4 py-2`}
       >
         {reason}
       </div>
@@ -50,60 +50,66 @@ const JobGridCard = ({
 
   return (
     <motion.div
+      className="my-2 w-[30%] min-w-[400px]"
       initial={{ scale: 0.5, opacity: 0, y: 50 }}
       animate={{ scale: 1, opacity: 1, y: 0 }}
       transition={{ ease: "easeOut", duration: 1 }}
     >
-      <Card className="flex h-full min-h-[648px] w-[460px] flex-col justify-between rounded-3xl border-slate-100 p-2 shadow-lg">
-        <CardHeader className="m-0 flex flex-row items-center justify-between space-y-0 p-2">
-          <div className="m-0 flex items-center rounded-full border border-slate-300 p-2 font-medium">
-            <i className="bx bx-calendar gradient-blue-font pr-1 text-2xl"></i>
-            12/09/24
+      <Card className="flex h-full min-h-[648px] flex-col rounded-3xl border-slate-200 p-4">
+        <CardHeader className="m-0 flex flex-col py-6">
+          <div className="m-0 flex flex-grow basis-16 flex-row items-start justify-between gap-2">
+            <h1 className="text-2xl font-bold">{title}</h1>
+            <div className="m-0 flex flex-col flex-nowrap items-start justify-start text-nowrap">
+              <p
+                className="m-0 rounded-full border px-2 font-bold"
+                style={{
+                  color: `hsl(${scoreFactor},100%,40%)`,
+                  backgroundColor: `hsl(${scoreFactor},100%,95%)`,
+                  borderColor: `hsl(${scoreFactor},100%,40%)`,
+                }}
+              >
+                {score * 100}% Match
+              </p>
+            </div>
           </div>
-          <div
-            className={`m-0 font-semibold`}
-            style={{ color: `hsl(${scoreFactor},100%,40%)` }}
-          >
-            {score * 100}% Match
+          <p className="gradient-blue-font mt-4 text-lg font-semibold">
+            {company}
+          </p>
+          <div className="mt-2 flex">
+            <i className="bx bx-calendar gradient-blue-font pr-1 text-xl"></i>
+            <p>02/10/2024</p>
           </div>
         </CardHeader>
-        <CardContent className="min-h-[516px] px-2 pt-6">
-          <div className="flex flex-col gap-0">
-            {/* {Company and Designation} */}
-            <p className="gradient-blue-font text-[1rem] font-semibold">
-              {company}
-            </p>
-            <h1 className="text-[2rem] font-bold">{title}</h1>
-          </div>
-          <div className="flex flex-col justify-between pt-4">
+        <CardContent className="">
+          <div className="flex flex-col">
             <div className="flex flex-col">
               {/* {Good Fit} */}
-              <p>Your Profile has</p>
+              <p className="font-semibold">Your Profile Matches:</p>
               {pillComponents(reasons_match, true)}
             </div>
             <div className="flex flex-col pt-4">
-              {/* {Good Fit} */}
-              <p>Your Profile Does not have</p>
+              {/* {No Good Fit} */}
+              <p className="font-semibold">Your Profile Does Not Match:</p>
               {pillComponents(reasons_no_match, false)}
             </div>
           </div>
         </CardContent>
-        <CardFooter className="m-0 my-2 flex flex-row gap-4 p-0 px-2">
-          <Button
-            asChild
-            className="gradient-blue w-full transition duration-300 hover:scale-105"
-          >
-            <Link href={apply_link}>
-              <i className="bx bx-link-external pr-1 text-2xl"></i>
-              <p className="font-bold">Apply Now</p>
-            </Link>
-          </Button>
+        <CardFooter className="mt-auto flex flex-row gap-4 p-0 px-2">
           <Button
             variant="outline"
             className="w-full border-slate-300 transition duration-300 hover:scale-105"
           >
             <i className="bx bx-bulb gradient-blue-font pr-1 text-2xl"></i>
             <p className="font-bold">More Insights</p>
+          </Button>
+          <Button
+            asChild
+            className="gradient-blue w-full transition duration-300 hover:scale-105"
+          >
+            <Link href={apply_link}>
+              <p className="font-bold">Apply Now</p>
+              <i className="bx bx-chevron-right pl-1 text-2xl"></i>
+            </Link>
           </Button>
         </CardFooter>
       </Card>

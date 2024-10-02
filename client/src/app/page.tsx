@@ -90,11 +90,11 @@ const Home = () => {
         </h1>
       </div>
       {/* ------------ Search Component Starts ------------ */}
-      <div className="mt-12 flex h-12 items-center justify-center rounded-lg border border-slate-300 md:w-11/12 xl:w-7/12 xl:min-w-[1000px]">
+      <div className="mt-12 flex h-12 items-center justify-center rounded-lg border border-slate-200 md:w-11/12 xl:w-7/12 xl:min-w-[1000px]">
         <div className="flex h-full w-7/12 flex-row items-center pl-4">
           <i className="bx bx-briefcase-alt gradient-blue-font text-2xl"></i>
           <Input
-            className="h-full rounded-r-none border-0 border-r-2 border-slate-300 focus-visible:ring-transparent focus-visible:ring-offset-0"
+            className="h-full rounded-r-none border-0 border-r-2 border-slate-200 focus-visible:ring-transparent focus-visible:ring-offset-0"
             placeholder="Job Titles, Companies"
             onChange={(event) => setSearchQuery(event.target.value)}
           />
@@ -215,7 +215,7 @@ const Home = () => {
       {/* ------------ JOBS Grid Starts ------------ */}
       <div
         ref={gridRef}
-        className="my-16 flex w-full flex-wrap justify-around gap-8 px-8 md:w-11/12 lg:p-0 xl:w-10/12"
+        className="my-14 flex w-full flex-wrap justify-center gap-2 md:w-11/12 md:justify-around lg:p-0 xl:w-10/12"
       >
         {renderJobGridComponents(jobGridComponentList)}
       </div>

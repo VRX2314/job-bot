@@ -99,7 +99,7 @@ const ConfigureMenu = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 1 }}
     >
-      <div className="flex flex-col gap-6 rounded-lg border-2 border-slate-100 p-4 md:w-11/12 xl:w-7/12 xl:min-w-[1000px]">
+      <div className="flex flex-col gap-6 rounded-lg border border-slate-200 p-4 md:w-11/12 xl:w-7/12 xl:min-w-[1000px]">
         <div className="flex gap-4">
           <Select
             defaultValue={selectedOption}
