@@ -1,20 +1,26 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 
 import {
   NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuIndicator,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
-  NavigationMenuViewport,
 } from "@/components/ui/navigation-menu";
+
+import { UserProfile } from "@auth0/nextjs-auth0/client";
 
 import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 import Link from "next/link";
+import Login from "@/components/auth-components/Login";
+import User from "@/components/auth-components/User";
 
 const Navbar = () => {
+  const [userStatus, setUserStatus] = useState<undefined | UserProfile>(
+    undefined,
+  );
+
   return (
     // Add Link Elements for Each Page
     <NavigationMenu className="absolute w-full min-w-full justify-center border-b">
@@ -41,6 +47,15 @@ const Navbar = () => {
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>
+        {!userStatus && (
+          <Link href="/api/auth/login" legacyBehavior passHref>
+            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              <Login />
+            </NavigationMenuLink>
+          </Link>
+        )}
+
+        <User setUserStatus={setUserStatus} />
       </NavigationMenuList>
     </NavigationMenu>
   );
