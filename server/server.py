@@ -3,6 +3,7 @@ from typing import Union
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 
+from crawler import Crawler
 from model import LLMCrawler
 from temp import temporary_job, temporary_resume
 
@@ -99,6 +100,14 @@ async def stream_llm_hybrid(query: str, location: str, listings: int = 1):
     return StreamingResponse(
         crawler.scrape(hybrid=True), media_type="text/event-stream"
     )
+
+
+##### Scraper Only No LLM #####
+@app.post("/stream-indeed")
+async def stream_indeed(query: str, location: str, listings: int = 1):
+    crawler = Crawler(query, location, listings)
+
+    return StreamingResponse(crawler.scrape_indeed_self())
 
 @app.get("/get-model-params")
 async def hybrid_params():

@@ -1,9 +1,15 @@
+import asyncio
+import json
 from datetime import datetime, timedelta
 
 import re
+from textwrap import indent
+
+from playwright.async_api import async_playwright
+import numpy as np
 
 
-#! Scraper Branch
+# ! Scraper Branch
 class Crawler:
     def __init__(self, query, location, listings):
         self.browser = None
@@ -14,12 +20,12 @@ class Crawler:
         self.location = location
 
         self.today = datetime.today().date()
-        
-    def convert_posting_time(self,posting_time_str):
-    # Check if the posting time contains "Just posted"
+
+    def convert_posting_time(self, posting_time_str):
+        # Check if the posting time contains "Just posted"
         if "Just posted" in posting_time_str:
             return datetime.now().strftime("%Y-%m-%d")  # Return today's date
-        
+
         # Use regex to find the number of days ago
         match = re.search(r'Posted (\d+) days ago', posting_time_str)
         if match:
@@ -72,10 +78,10 @@ class Crawler:
             if job_description_element
             else None
         )
-        
+
         posting_time_element = await self.page.query_selector('span[data-testid="myJobsStateDate"]')
         posting_time_str = await posting_time_element.inner_text() if posting_time_element else "N/A"
-        posting_date  = self.convert_posting_time(posting_time_str=posting_time_str)
+        posting_date = self.convert_posting_time(posting_time_str=posting_time_str)
 
         return {
             "Title": job_title,
@@ -85,3 +91,36 @@ class Crawler:
             "Link": self.page.url,
             "Date": posting_date
         }
+
+    async def scrape_indeed_self(self):
+        async with async_playwright() as p:
+            await self._load_browser(p)
+            await self._load_page()
+            counter = 0
+
+            while counter < self.listings:
+                job_elements = await self.page.query_selector_all(
+                    ".jobTitle.css-198pbd.eu4oa1w0"
+                )
+
+                for job in job_elements:
+                    scraped_job = await self.scrape_indeed(job)
+
+                    yield json.dumps(scraped_job, indent=2)  # dict -> str to stream
+
+                    # Simulating randomness to avoid bot detection
+                    await asyncio.sleep(np.random.choice(np.arange(1, 2, 0.0001)))
+
+                    counter += 1
+                    if self.listings == counter:
+                        break
+
+                # Page navigation
+                next_button = await self.page.query_selector(
+                    'a[data-testid="pagination-page-next"]'
+                )
+                if next_button:
+                    await next_button.click()
+                    await self.page.wait_for_timeout(5000)
+                else:
+                    break
