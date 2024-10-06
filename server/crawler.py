@@ -41,7 +41,21 @@ class Crawler:
         await self.page.click("button.yosegi-InlineWhatWhere-primaryButton")
 
         await self.page.click("span#dateLabel")
+        # Close modal if it appears
+        await self._close_modal()
         await self.page.wait_for_timeout(1000)
+
+    async def _close_modal(self):
+        try:
+            # Wait for the modal to appear and then close it
+            await self.page.wait_for_selector("#mosaic-desktopserpjapopup", timeout=5000)
+            close_button = await self.page.query_selector("button[aria-label='close']")
+            if close_button:
+                await asyncio.sleep(np.random.choice(np.arange(1, 2, 0.0001)))
+                await close_button.click()
+                print("Modal closed.")
+        except Exception as e:
+            print("No modal appeared or failed to close:", str(e))
 
     async def _load_browser(self, p):
         self.browser = await p.chromium.launch(headless=False)
@@ -109,7 +123,7 @@ class Crawler:
                     yield json.dumps(scraped_job, indent=2)  # dict -> str to stream
 
                     # Simulating randomness to avoid bot detection
-                    await asyncio.sleep(np.random.choice(np.arange(1, 2, 0.0001)))
+                    await asyncio.sleep(np.random.choice(np.arange(1, 3, 0.0001)))
 
                     counter += 1
                     if self.listings == counter:
