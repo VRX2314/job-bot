@@ -72,4 +72,18 @@ class LLMCrawler(Crawler):
                 else:
                     break
 
+    async def infer(self, jobs):
+        for idx in range(len(jobs)):
+            description = jobs["description"].iloc[idx]
+            response = self.condenser_evaluator_graph.execute_hybrid_graph(prompt=description)
+            response["job_title"] = jobs["title"].iloc[idx]
+            response["company"] = jobs["company"].iloc[idx]
+            response["id"] = jobs["id"].iloc[idx]
+            response["link"] = jobs["job_url"].iloc[idx]
+            response["date"] = jobs["date_posted"].iloc[idx].strftime("%d-%m-%Y")
+
+            yield json.dumps(response, indent=2)
+            await asyncio.sleep(0.25) # For rate limiting
+
+
     

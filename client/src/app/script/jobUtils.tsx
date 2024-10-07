@@ -39,8 +39,16 @@ const generateResponse = async (
   gridRef.current?.scrollIntoView({ behavior: "smooth" });
   let tempId = 0;
 
+  // const response = await fetch(
+  //   `http://127.0.0.1:8000/stream-llm-hybrid?query=${searchQuery}&location=${searchLocation}&listings=${config["numListings"]}`,
+  //   {
+  //     method: "POST",
+  //     headers: { "Content-Type": "application/json+stream" },
+  //   },
+  // );
+
   const response = await fetch(
-    `http://127.0.0.1:8000/stream-llm-hybrid?query=${searchQuery}&location=${searchLocation}&listings=${config["numListings"]}`,
+    `http://127.0.0.1:8000/stream-llm-jobspy?query=${searchQuery}&location=${searchLocation}&listings=${config["numListings"]}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json+stream" },

@@ -17,6 +17,8 @@ import asyncio
 import pymupdf
 import re
 
+from jobspy import scrape_jobs
+
 load_dotenv()
 
 groq_key = os.getenv("GROQ_API_KEY")
@@ -139,3 +141,24 @@ async def upload_resume(file: UploadFile = File(...)):
 
     except Exception as e:
         return {"error": str(e)}
+
+@app.post("/stream-llm-jobspy")
+async def stream_llm_jobspy(query:str, location:str, listings:int = 1):
+    # TODO: Add provider support
+    # TODO: Test performance on LinkedIn, Glassdoor
+    jobs = scrape_jobs(
+        site_name=["indeed"],
+        search_term=query,
+        location=location,
+        results_wanted=listings,
+        country_indeed=location,
+        verbose=0,
+    ) # Synchronous Process -> Sub 1-second performance
+
+    crawler = LLMCrawler("", "", listings, model, resume)
+
+    return StreamingResponse(
+        crawler.infer(jobs), media_type="text/event-stream"
+    ) # Streaming each JSON immediately
+
+
