@@ -63,10 +63,12 @@ const ConfigureMenu = ({
     setApiKey("");
     setSelectedOption(value);
     if (value === "groq") {
-      setPlaceHolder("Enter your Groq API Key");
+      setPlaceHolder("Enter your Groq API Key. This is not stored locally.");
       setInputType("password");
     } else if (value === "ollama") {
-      setPlaceHolder("Enter your Ollama Endpoint");
+      setPlaceHolder(
+        "Enter your Ollama Endpoint. This is not implemented yet.",
+      );
       setInputType("text");
     }
   };

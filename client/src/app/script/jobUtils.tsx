@@ -21,9 +21,11 @@ const generateResponse = async (
     [...prevList, ...jobGridComponentList].sort((a, b) => b.score - a.score),
   );
 
+  setJobGridComponentList([]);
+
   if (isConfigured) {
     const response = await fetch(
-      `http://127.0.0.1:8000/setup-params-groq?model_backbone=${config["modelBackBone"]}`,
+      `https://vrx2314-server--8000.prod1a.defang.dev/setup-params-groq?model_backbone=${config["modelBackBone"]}`,
       {
         method: "POST",
         credentials: "include",
@@ -42,7 +44,7 @@ const generateResponse = async (
   let tempId = 0;
 
   const response = await fetch(
-    `http://127.0.0.1:8000/stream-llm-jobspy?query=${searchQuery}&location=${searchLocation}&listings=${config["numListings"]}`,
+    `https://vrx2314-server--8000.prod1a.defang.dev/stream-llm-jobspy?query=${searchQuery}&location=${searchLocation}&listings=${config["numListings"]}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json+stream" },
@@ -102,10 +104,13 @@ const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
   const formData = new FormData();
   formData.append("file", file);
 
-  const response = await fetch("http://127.0.0.1:8000/upload-resume/", {
-    method: "POST",
-    body: formData,
-  });
+  const response = await fetch(
+    "https://vrx2314-server--8000.prod1a.defang.dev/upload-resume/",
+    {
+      method: "POST",
+      body: formData,
+    },
+  );
 
   const data = await response.json();
   console.log(data);

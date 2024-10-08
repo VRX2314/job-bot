@@ -4,13 +4,9 @@ from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from model import LLMCrawler
-from temp import temporary_job, temporary_resume
 
-from langsmith import Client
 from langchain_groq import ChatGroq
 
-import os
-from dotenv import load_dotenv
 import json
 import asyncio
 
@@ -18,22 +14,10 @@ import pymupdf
 import re
 
 from jobspy import scrape_jobs
-
-load_dotenv()
-
-groq_key = os.getenv("GROQ_API_KEY")
-langsmith_key = os.getenv("LANGSMITH_API_KEY")
-os.system("export LANGCHAIN_TRACING_V2=true")
-
-# NOTE: For testing purposes
-resume = temporary_resume()
-
-client = Client()
-
 app = FastAPI()
 
 # To connect to front end
-origins = ["http://localhost:3000", "http://localhost:8000"]
+origins = ["http://localhost:3000", "http://localhost:8000", "https://vrx2314-client--3000.prod1a.defang.dev"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -43,13 +27,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-model = ChatGroq(
-    model="llama-3.1-70b-versatile",
-    temperature=0,
-    max_tokens=None,
-    timeout=None,
-    max_retries=2,
-)
+resume = """"""
 
 @app.post("/setup-params-groq")
 async def set_params_groq(
@@ -73,6 +51,7 @@ async def set_params_groq(
         "api": api_key,
     }
 
+
 @app.get("/get-model-params")
 async def hybrid_params():
     crawler = LLMCrawler("", "", model, resume)
@@ -80,7 +59,7 @@ async def hybrid_params():
 
 
 @app.post("/stream-llm-jobspy")
-async def stream_llm_jobspy(query:str, location:str, listings:int = 1):
+async def stream_llm_jobspy(query: str= "", location: str= "", listings: int = 1):
     # TODO: Add provider support
     # TODO: Test performance on LinkedIn, Glassdoor
     jobs = scrape_jobs(
@@ -90,13 +69,44 @@ async def stream_llm_jobspy(query:str, location:str, listings:int = 1):
         results_wanted=listings,
         country_indeed=location,
         verbose=0,
-    ) # Synchronous Process -> Sub 1-second performance
+    )  # Synchronous Process -> Sub 1-second performance
+
+    # if resume == "":
+    #     default_resp = {
+    #         "job_title": "Invalid Resume",
+    #         "company": "Invalid",
+    #         "link": "/",
+    #         "date": "None",
+    #         "response_evaluator": {
+    #             "score": 0,
+    #             "reasons_match": [""],
+    #             "reasons_no_match": [""],
+    #             "reasons_match_c": [""],
+    #             "reasons_no_match_c": [""]
+    #         },
+    #         "metadata_evaluator": {
+    #             "token_usage": {
+    #                 "completion_tokens": 0,
+    #                 "prompt_tokens": 0,
+    #                 "total_tokens": 0,
+    #                 "completion_time": 0,
+    #                 "prompt_time": 0,
+    #                 "queue_time": 0,
+    #                 "total_time": 0
+    #             },
+    #             "model_name": "none",
+    #         },
+    #         "api_calls": 0
+    #     }
+    #
+    #     return StreamingResponse(json.dumps(default_resp), media_type="text/event-stream")
 
     crawler = LLMCrawler("", "", listings, model, resume)
 
     return StreamingResponse(
         crawler.infer(jobs), media_type="text/event-stream"
-    ) # Streaming each JSON immediately
+    )  # Streaming each JSON immediately
+
 
 @app.post("/upload-resume")
 async def upload_resume(file: UploadFile = File(...)):
@@ -117,6 +127,7 @@ async def upload_resume(file: UploadFile = File(...)):
     except Exception as e:
         return {"error": str(e)}
 
+
 async def stream_json():
     with open("./temp/hybrid_new.json") as json_data:
         data = json.load(json_data)
@@ -131,6 +142,3 @@ async def stream_json():
 async def stream_test():
     # return StreamingResponse(stream_json(), media_type="application/stream+json")
     return StreamingResponse(stream_json(), media_type="text/event-stream")
-
-
-

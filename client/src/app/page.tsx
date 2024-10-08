@@ -14,12 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import linkedin from "@/public/assets/linkedin.png";
-import glassdoor from "@/public/assets/glassdoor.png";
 import indeed from "@/public/assets/indeed.png";
-
-import DebugMenu from "@/components/DebugMenu";
-import { generateDummyResponse } from "@/app/debugging/generateDummy";
 
 import ConfigureMenu from "@/components/ConfigureMenu";
 import SpecialMenu from "@/components/SpecialMenu";
@@ -41,7 +36,7 @@ const Home = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
-  const [selectedOption, setSelectedOption] = useState("linkedin");
+  const [selectedOption, setSelectedOption] = useState("indeed");
   const [configureMenu, setConfigureMenu] = useState(true);
   const [specialMenu, setSpecialMenu] = useState(false);
   const [isConfigured, setIsConfigured] = useState(true);
@@ -74,24 +69,11 @@ const Home = () => {
   // TODO: Refactor to better align with SOLID principles
   return (
     <div className="flex flex-col items-center justify-center">
-      <DebugMenu
-        genResp={() =>
-          generateDummyResponse(
-            jobGridComponentList,
-            setJobGridComponentList,
-            setPersistJobGridComponentList,
-            config,
-            isConfigured,
-            setIsConfigured,
-            setApiCalls,
-            setTokenUsage,
-          )
-        }
-      />
       <div className="mt-32 flex w-full max-w-full flex-col items-center justify-center">
         <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
           Bot Interface V1
         </h1>
+        <p>⚠️ Many Features are still WIP and May Fail ⚠️</p>
       </div>
       {/* ------------ Search Component Starts ------------ */}
       <div className="mt-12 flex h-12 items-center justify-center rounded-lg border border-slate-200 md:w-11/12 xl:w-7/12 xl:min-w-[1000px]">
@@ -146,17 +128,6 @@ const Home = () => {
             <SelectValue placeholder="Select Portal" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="linkedin" className="hover:cursor-pointer">
-              <div className="flex items-center gap-1">
-                <Image
-                  src={linkedin}
-                  alt={"LinkedIn logo"}
-                  width={16}
-                  height={16}
-                />
-                <p>LinkedIn</p>
-              </div>
-            </SelectItem>
             <SelectItem value="indeed" className="hover:cursor-pointer">
               <div className="flex items-center gap-1">
                 <Image
@@ -166,17 +137,6 @@ const Home = () => {
                   height={16}
                 />
                 <p>Indeed</p>
-              </div>
-            </SelectItem>
-            <SelectItem value="glassdoor" className="hover:cursor-pointer">
-              <div className="flex items-center gap-1">
-                <Image
-                  src={glassdoor}
-                  alt={"Glass Door logo"}
-                  width={16}
-                  height={16}
-                />
-                <p>GlassDoor</p>
               </div>
             </SelectItem>
           </SelectContent>
