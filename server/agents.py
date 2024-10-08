@@ -9,7 +9,7 @@ import json
 
 client = Client()
 
-
+# TODO: Refactor in Langgraph for dynamic graph workflows.
 class Agent:
     def __init__(self, model_instance):
         self.model = model_instance
@@ -21,7 +21,7 @@ class Agent:
 
         return response
 
-
+# For locally hosted SLMs to reduce overall token payload.
 class CondenserAgent(Agent):
     def __init__(self, model_instance):
         super().__init__(model_instance)

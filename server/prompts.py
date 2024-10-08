@@ -87,7 +87,7 @@ Here are some user specific instructions and details. These details should stric
 
 {instructions}
 
-Output Format: Return the results strictly in the following JSON format with no additional text:
+Output Format: Return the results strictly in the following JSON format string with no additional text:
 score: The calculated suitability score, should in range of 0 to 1
 reasons_match: A list of strings containing short reasons and descriptions of why candidate is a good fit and should apply. This field should have at max 5 strings.
 reasons_no_match: A list of strings containing short reasons and descriptions of why candidate is not a good fit and should apply. This field should have at max 5 strings.

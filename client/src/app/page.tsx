@@ -32,6 +32,7 @@ import {
 } from "@/app/script/jobUtils";
 
 const Home = () => {
+  // TODO: Reduce clutter with useReducer
   const [jobGridComponentList, setJobGridComponentList] = useState<
     JobDataItem[]
   >([]);
@@ -44,6 +45,8 @@ const Home = () => {
   const [configureMenu, setConfigureMenu] = useState(true);
   const [specialMenu, setSpecialMenu] = useState(false);
   const [isConfigured, setIsConfigured] = useState(true);
+
+  // TODO: Add form validation
   const [config, setConfig] = useState<{ [key: string]: string | number }>({
     inferenceEngine: "groq",
     apiKey: "",
@@ -68,6 +71,7 @@ const Home = () => {
     }
   };
 
+  // TODO: Refactor to better align with SOLID principles
   return (
     <div className="flex flex-col items-center justify-center">
       <DebugMenu

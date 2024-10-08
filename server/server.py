@@ -51,21 +51,6 @@ model = ChatGroq(
     max_retries=2,
 )
 
-
-@app.get("/stream-llm")
-async def stream_llm():
-    config_path = "./config/config.json"
-    if os.path.exists(config_path):
-        with open(config_path, "r") as file:
-            config = json.load(file)
-        print("Config loaded:", config)
-    else:
-        print(f"Config file {config_path} does not exist.")
-    crawler = LLMCrawler(config, model, resume)
-
-    return StreamingResponse(crawler.scrape(), media_type="text/event-stream")
-
-
 @app.post("/setup-params-groq")
 async def set_params_groq(
         api_key: Union[str, None] = Body(...), model_backbone: str = "llama-3.1-70b-versatile"
@@ -88,40 +73,30 @@ async def set_params_groq(
         "api": api_key,
     }
 
-
-@app.post("/setup-params-ollama")
-async def set_params_ollama():
-    pass
-
-
-@app.post("/stream-llm-hybrid")
-async def stream_llm_hybrid(query: str, location: str, listings: int = 1):
-    crawler = LLMCrawler(query, location, listings, model, resume)
-
-    return StreamingResponse(
-        crawler.scrape(hybrid=True), media_type="text/event-stream"
-    )
-
 @app.get("/get-model-params")
 async def hybrid_params():
     crawler = LLMCrawler("", "", model, resume)
     return {"prompt": str(crawler.hybrid.system_prompt)}
 
 
-async def stream_json():
-    with open("./temp/hybrid_new.json") as json_data:
-        data = json.load(json_data)
-        json_data.close()
+@app.post("/stream-llm-jobspy")
+async def stream_llm_jobspy(query:str, location:str, listings:int = 1):
+    # TODO: Add provider support
+    # TODO: Test performance on LinkedIn, Glassdoor
+    jobs = scrape_jobs(
+        site_name=["indeed"],
+        search_term=query,
+        location=location,
+        results_wanted=listings,
+        country_indeed=location,
+        verbose=0,
+    ) # Synchronous Process -> Sub 1-second performance
 
-    for i in data:
-        yield json.dumps(i, indent=2)
-        await asyncio.sleep(0.5)
+    crawler = LLMCrawler("", "", listings, model, resume)
 
-
-@app.get("/stream-test")
-async def stream_test():
-    # return StreamingResponse(stream_json(), media_type="application/stream+json")
-    return StreamingResponse(stream_json(), media_type="text/event-stream")
+    return StreamingResponse(
+        crawler.infer(jobs), media_type="text/event-stream"
+    ) # Streaming each JSON immediately
 
 @app.post("/upload-resume")
 async def upload_resume(file: UploadFile = File(...)):
@@ -142,23 +117,20 @@ async def upload_resume(file: UploadFile = File(...)):
     except Exception as e:
         return {"error": str(e)}
 
-@app.post("/stream-llm-jobspy")
-async def stream_llm_jobspy(query:str, location:str, listings:int = 1):
-    # TODO: Add provider support
-    # TODO: Test performance on LinkedIn, Glassdoor
-    jobs = scrape_jobs(
-        site_name=["indeed"],
-        search_term=query,
-        location=location,
-        results_wanted=listings,
-        country_indeed=location,
-        verbose=0,
-    ) # Synchronous Process -> Sub 1-second performance
+async def stream_json():
+    with open("./temp/hybrid_new.json") as json_data:
+        data = json.load(json_data)
+        json_data.close()
 
-    crawler = LLMCrawler("", "", listings, model, resume)
+    for i in data:
+        yield json.dumps(i, indent=2)
+        await asyncio.sleep(0.5)
 
-    return StreamingResponse(
-        crawler.infer(jobs), media_type="text/event-stream"
-    ) # Streaming each JSON immediately
+
+@app.get("/stream-test")
+async def stream_test():
+    # return StreamingResponse(stream_json(), media_type="application/stream+json")
+    return StreamingResponse(stream_json(), media_type="text/event-stream")
+
 
 
