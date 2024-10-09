@@ -16,12 +16,14 @@ const generateResponse = async (
   gridRef: MutableRefObject<HTMLDivElement | null>,
   setApiCalls: Dispatch<SetStateAction<number>>,
   setTokenUsage: Dispatch<SetStateAction<number>>,
+  setLoading: Dispatch<SetStateAction<boolean>>,
 ) => {
   setPersistJobGridComponentList((prevList) =>
     [...prevList, ...jobGridComponentList].sort((a, b) => b.score - a.score),
   );
 
   setJobGridComponentList([]);
+  setLoading(true);
 
   if (isConfigured) {
     const response = await fetch(
@@ -91,6 +93,7 @@ const generateResponse = async (
 
     jobDataList.sort((a, b) => b.score - a.score);
     setJobGridComponentList([...jobDataList]);
+    setLoading(false);
     setApiCalls((prevCalls) => (prevCalls += 1));
     setTokenUsage(
       (prevTokens) =>

@@ -27,6 +27,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# TODO: Better State Management
 resume = """"""
 
 @app.post("/setup-params-groq")

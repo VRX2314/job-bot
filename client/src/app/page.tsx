@@ -40,6 +40,7 @@ const Home = () => {
   const [configureMenu, setConfigureMenu] = useState(true);
   const [specialMenu, setSpecialMenu] = useState(false);
   const [isConfigured, setIsConfigured] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   // TODO: Add form validation
   const [config, setConfig] = useState<{ [key: string]: string | number }>({
@@ -74,6 +75,7 @@ const Home = () => {
           Bot Interface V1
         </h1>
         <p>⚠️ Many Features are still WIP and May Fail ⚠️</p>
+        <p>Mobile Devices Not Supported</p>
       </div>
       {/* ------------ Search Component Starts ------------ */}
       <div className="mt-12 flex h-12 items-center justify-center rounded-lg border border-slate-200 md:w-11/12 xl:w-7/12 xl:min-w-[1000px]">
@@ -108,6 +110,7 @@ const Home = () => {
               gridRef,
               setApiCalls,
               setTokenUsage,
+              setLoading,
             )
           }
         >
@@ -181,7 +184,13 @@ const Home = () => {
         ref={gridRef}
         className="my-14 flex w-full flex-wrap justify-center gap-2 md:w-11/12 md:justify-around lg:p-0 xl:w-10/12"
       >
-        {renderJobGridComponents(jobGridComponentList)}
+        {loading ? (
+          <>
+            <p>Loading...</p>
+          </>
+        ) : (
+          renderJobGridComponents(jobGridComponentList)
+        )}
       </div>
       {persistJobGridComponentList.length > 0 ? (
         <div className="min-h-2 min-w-[80%] rounded-full bg-slate-200"></div>
