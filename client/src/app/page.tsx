@@ -124,7 +124,7 @@ const Home = () => {
             setSelectedOption(value);
           }}
         >
-          <SelectTrigger className="soft-animate w-[200px] border-slate-300 hover:bg-slate-100">
+          <SelectTrigger className="soft-animate w-full border-slate-300 hover:bg-slate-100 lg:w-[200px]">
             <SelectValue placeholder="Select Portal" />
           </SelectTrigger>
           <SelectContent>
@@ -149,14 +149,14 @@ const Home = () => {
         />
         <Button
           variant="outline"
-          className="soft-animate border-slate-300"
+          className="soft-animate flex w-full gap-2 border-slate-300 lg:w-fit"
           onClick={() => toggleMenu(2)}
         >
-          <i className="bx bxs-magic-wand gradient-blue-font pr-1 text-2xl"></i>
-          Add Special Instructions
+          <i className="bx bxs-magic-wand gradient-blue-font text-2xl"></i>
+          <p>Add Special Instructions</p>
         </Button>
         <Button
-          className="gradient-blue border-0 transition"
+          className="gradient-blue w-full border-0 transition lg:w-fit"
           onClick={() => toggleMenu(1)}
         >
           <i className="bx bx-cog pr-1 text-2xl"></i>Configure
