@@ -71,36 +71,6 @@ async def stream_llm_jobspy(query: str= "", location: str= "", listings: int = 1
         verbose=0,
     )  # Synchronous Process -> Sub 1-second performance
 
-    # if resume == "":
-    #     default_resp = {
-    #         "job_title": "Invalid Resume",
-    #         "company": "Invalid",
-    #         "link": "/",
-    #         "date": "None",
-    #         "response_evaluator": {
-    #             "score": 0,
-    #             "reasons_match": [""],
-    #             "reasons_no_match": [""],
-    #             "reasons_match_c": [""],
-    #             "reasons_no_match_c": [""]
-    #         },
-    #         "metadata_evaluator": {
-    #             "token_usage": {
-    #                 "completion_tokens": 0,
-    #                 "prompt_tokens": 0,
-    #                 "total_tokens": 0,
-    #                 "completion_time": 0,
-    #                 "prompt_time": 0,
-    #                 "queue_time": 0,
-    #                 "total_time": 0
-    #             },
-    #             "model_name": "none",
-    #         },
-    #         "api_calls": 0
-    #     }
-    #
-    #     return StreamingResponse(json.dumps(default_resp), media_type="text/event-stream")
-
     crawler = LLMCrawler("", "", listings, model, resume)
 
     return StreamingResponse(
@@ -113,9 +83,7 @@ async def upload_resume(file: UploadFile = File(...)):
     try:
         contents = await file.read()
         with pymupdf.open(stream=contents, filetype="pdf") as doc:
-            text = ""
-            for page in doc:
-                text += page.get_text()
+            text = "".join(page.get_text() for page in doc)
 
         processed_text = re.sub(r'\n{2,}|\s*•\s*|\s*\(\w+\)\s*|\s*-\s*', '', text)
 

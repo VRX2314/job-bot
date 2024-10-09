@@ -2,6 +2,9 @@ import JobGridCard from "@/components/JobGridCard";
 import { JobData, JobDataItem } from "@/app/script/jobDataInterfaces";
 import React, { Dispatch, MutableRefObject, SetStateAction } from "react";
 
+const host = window.location.hostname;
+const protocol = window.location.protocol;
+
 // TODO: Add integration for other LLM providers
 // TODO: Separate generateResponse and updateConfig functions
 const generateResponse = async (
@@ -25,7 +28,7 @@ const generateResponse = async (
 
   if (isConfigured) {
     const response = await fetch(
-      `https://vrx2314-server--8000.prod1a.defang.dev/setup-params-groq?model_backbone=${config["modelBackBone"]}`,
+      `${protocol}//${host}:8000/setup-params-groq?model_backbone=${config["modelBackBone"]}`,
       {
         method: "POST",
         credentials: "include",
@@ -44,7 +47,7 @@ const generateResponse = async (
   let tempId = 0;
 
   const response = await fetch(
-    `https://vrx2314-server--8000.prod1a.defang.dev/stream-llm-jobspy?query=${searchQuery}&location=${searchLocation}&listings=${config["numListings"]}`,
+    `${protocol}//${host}/stream-llm-jobspy?query=${searchQuery}&location=${searchLocation}&listings=${config["numListings"]}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json+stream" },
@@ -104,13 +107,14 @@ const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
   const formData = new FormData();
   formData.append("file", file);
 
-  const response = await fetch(
-    "https://vrx2314-server--8000.prod1a.defang.dev/upload-resume/",
-    {
-      method: "POST",
-      body: formData,
-    },
-  );
+  const response = await fetch(`${protocol}//${host}:8000/upload-resume/`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
 
   const data = await response.json();
   console.log(data);
