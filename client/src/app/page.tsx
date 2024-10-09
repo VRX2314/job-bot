@@ -185,9 +185,7 @@ const Home = () => {
         className="my-14 flex w-full flex-wrap justify-center gap-2 md:w-11/12 md:justify-around lg:p-0 xl:w-10/12"
       >
         {loading ? (
-          <>
-            <p>Loading...</p>
-          </>
+          <div className="loader"></div>
         ) : (
           renderJobGridComponents(jobGridComponentList)
         )}
