@@ -75,7 +75,7 @@ const Home = () => {
           Bot Interface V1
         </h1>
         <p>⚠️ Many Features are still WIP and May Fail ⚠️</p>
-        <p>Mobile Devices Not Supported</p>
+        <p>Mobile Support Coming Soon</p>
       </div>
       {/* ------------ Search Component Starts ------------ */}
       <div className="mt-12 flex h-12 items-center justify-center rounded-lg border border-slate-200 md:w-11/12 xl:w-7/12 xl:min-w-[1000px]">
