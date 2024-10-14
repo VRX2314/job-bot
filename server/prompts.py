@@ -87,12 +87,13 @@ Here are some user specific instructions and details. These details should stric
 
 {instructions}
 
-Output Format: Return the results strictly in the following JSON format with no additional text:
-score: The calculated suitability score, should in range of 0 to 1
+Output Format: Return the results strictly in the following JSON format string with no additional text:
+score: The calculated suitability score, should in range of 0 to 1. 
 reasons_match: A list of strings containing short reasons and descriptions of why candidate is a good fit and should apply. This field should have at max 5 strings.
 reasons_no_match: A list of strings containing short reasons and descriptions of why candidate is not a good fit and should apply. This field should have at max 5 strings.
 reasons_match_c: One to three word descriptions of each string in reasons_match.
 reasons_no_match_c: One to three word descriptions of each string in reasons_no_match.
-When stating reasons, the reasons should be in first person perspective to the candidate, use words such as you and your.""".format(
+When stating reasons, the reasons should be in first person perspective to the candidate, use words such as you and your.
+Ensure the output format is strictly followed and provide each answer with no preamble or explanation.""".format(
         user_resume=resume, instructions=instructions
 )

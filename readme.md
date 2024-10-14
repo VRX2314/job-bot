@@ -2,6 +2,8 @@
 Current Status
 ![Demo.gif](./images/Demo.gif "Demo")
 
+This is the defang deployed branch. Many features and code refactors are yet to be added.
+
 ## Job Bot V1
 
 A fullstack Generative AI project that uses LLMs and Web Scraping to find the most suitable jobs based on candidate resume and provides a candidate dashboard.
@@ -10,16 +12,18 @@ A fullstack Generative AI project that uses LLMs and Web Scraping to find the mo
 
 - [x] Integrate ShadCN
 - [x] Complete UI
+- [x] Defang Deployment
 - [ ] Make UI Responsive
+- [ ] Add Mobile Support
 - [x] Improve Scraper Speed
 - [x] Connect Configuration Frontend to Backend
-- [ ] Langgraph Migration 
+- [ ] Langgraph Migration for dynamic graphs
 - [ ] Parallel Scraping
 - [ ] MongoDB Integration
+- [ ] Indexed Scraping
+- [ ] Refactor to SOLID principles
+- [ ] Search form validation
+- [ ] Ollama Support
 
-### Repository Branches
-
-- shadcn-ui - Primary Branch for UI Development
-- scraper - Branch for scraper development and updates
-- api - Branch for backend API development and integration
-- master - Main branch
+### Hosted On
+https://vrx2314-client--3000.prod1a.defang.dev/

@@ -14,12 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import linkedin from "@/public/assets/linkedin.png";
-import glassdoor from "@/public/assets/glassdoor.png";
 import indeed from "@/public/assets/indeed.png";
-
-import DebugMenu from "@/components/DebugMenu";
-import { generateDummyResponse } from "@/app/debugging/generateDummy";
 
 import ConfigureMenu from "@/components/ConfigureMenu";
 import SpecialMenu from "@/components/SpecialMenu";
@@ -31,7 +26,11 @@ import {
   renderJobGridComponents,
 } from "@/app/script/jobUtils";
 
+import { generateDummyResponse } from "@/app/debugging/generateDummy";
+import DebugMenu from "@/components/DebugMenu";
+
 const Home = () => {
+  // TODO: Reduce clutter with useReducer
   const [jobGridComponentList, setJobGridComponentList] = useState<
     JobDataItem[]
   >([]);
@@ -40,10 +39,13 @@ const Home = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
-  const [selectedOption, setSelectedOption] = useState("linkedin");
+  const [selectedOption, setSelectedOption] = useState("indeed");
   const [configureMenu, setConfigureMenu] = useState(true);
   const [specialMenu, setSpecialMenu] = useState(false);
   const [isConfigured, setIsConfigured] = useState(true);
+  const [loading, setLoading] = useState(false);
+
+  // TODO: Add form validation
   const [config, setConfig] = useState<{ [key: string]: string | number }>({
     inferenceEngine: "groq",
     apiKey: "",
@@ -68,6 +70,7 @@ const Home = () => {
     }
   };
 
+  // TODO: Refactor to better align with SOLID principles
   return (
     <div className="flex flex-col items-center justify-center">
       <DebugMenu
@@ -88,6 +91,8 @@ const Home = () => {
         <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
           Bot Interface V1
         </h1>
+        <p>⚠️ Many Features are still WIP and May Fail ⚠️</p>
+        <p>Mobile Support Coming Soon</p>
       </div>
       {/* ------------ Search Component Starts ------------ */}
       <div className="mt-12 flex h-12 items-center justify-center rounded-lg border border-slate-200 md:w-11/12 xl:w-7/12 xl:min-w-[1000px]">
@@ -122,6 +127,7 @@ const Home = () => {
               gridRef,
               setApiCalls,
               setTokenUsage,
+              setLoading,
             )
           }
         >
@@ -138,21 +144,10 @@ const Home = () => {
             setSelectedOption(value);
           }}
         >
-          <SelectTrigger className="soft-animate w-[200px] border-slate-300 hover:bg-slate-100">
+          <SelectTrigger className="soft-animate w-full border-slate-300 hover:bg-slate-100 lg:w-[200px]">
             <SelectValue placeholder="Select Portal" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="linkedin" className="hover:cursor-pointer">
-              <div className="flex items-center gap-1">
-                <Image
-                  src={linkedin}
-                  alt={"LinkedIn logo"}
-                  width={16}
-                  height={16}
-                />
-                <p>LinkedIn</p>
-              </div>
-            </SelectItem>
             <SelectItem value="indeed" className="hover:cursor-pointer">
               <div className="flex items-center gap-1">
                 <Image
@@ -162,17 +157,6 @@ const Home = () => {
                   height={16}
                 />
                 <p>Indeed</p>
-              </div>
-            </SelectItem>
-            <SelectItem value="glassdoor" className="hover:cursor-pointer">
-              <div className="flex items-center gap-1">
-                <Image
-                  src={glassdoor}
-                  alt={"Glass Door logo"}
-                  width={16}
-                  height={16}
-                />
-                <p>GlassDoor</p>
               </div>
             </SelectItem>
           </SelectContent>
@@ -185,14 +169,14 @@ const Home = () => {
         />
         <Button
           variant="outline"
-          className="soft-animate border-slate-300"
+          className="soft-animate flex w-full gap-2 border-slate-300 lg:w-fit"
           onClick={() => toggleMenu(2)}
         >
-          <i className="bx bxs-magic-wand gradient-blue-font pr-1 text-2xl"></i>
-          Add Special Instructions
+          <i className="bx bxs-magic-wand gradient-blue-font text-2xl"></i>
+          <p>Add Special Instructions</p>
         </Button>
         <Button
-          className="gradient-blue border-0 transition"
+          className="gradient-blue w-full border-0 transition lg:w-fit"
           onClick={() => toggleMenu(1)}
         >
           <i className="bx bx-cog pr-1 text-2xl"></i>Configure
@@ -217,7 +201,11 @@ const Home = () => {
         ref={gridRef}
         className="my-14 flex w-full flex-wrap justify-center gap-2 md:w-11/12 md:justify-around lg:p-0 xl:w-10/12"
       >
-        {renderJobGridComponents(jobGridComponentList)}
+        {loading ? (
+          <div className="loader"></div>
+        ) : (
+          renderJobGridComponents(jobGridComponentList)
+        )}
       </div>
       {persistJobGridComponentList.length > 0 ? (
         <div className="min-h-2 min-w-[80%] rounded-full bg-slate-200"></div>

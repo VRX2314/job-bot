@@ -3,14 +3,12 @@ import numpy as np
 from crawler import Crawler
 from agents import CondenserAgent, EvaluatorAgent, CondenserEvaluatorGraph, HybridAgent
 from playwright.async_api import async_playwright
-from warnings import filterwarnings
-from temp import temporary_resume
-from langchain_groq import ChatGroq
 import asyncio
 
 class LLMCrawler(Crawler):
     def __init__(self, query, location, listings,  model, resume):
         super().__init__(query, location, listings)
+        # TODO: Implement Langgraph to make dynamic
         self.condenser = CondenserAgent(model)
         self.evaluator = EvaluatorAgent(model, resume)
         self.hybrid = HybridAgent(model, resume)
@@ -18,6 +16,7 @@ class LLMCrawler(Crawler):
             self.condenser, self.evaluator, self.hybrid
         )
 
+    # Headed Scraper - A feature of the future :D
     async def scrape(self, hybrid: bool = True):
         async with async_playwright() as p:
             ctx = 0
@@ -71,5 +70,19 @@ class LLMCrawler(Crawler):
                     await self.page.wait_for_timeout(5000)
                 else:
                     break
+
+    async def infer(self, jobs):
+        for idx in range(len(jobs)):
+            description = jobs["description"].iloc[idx]
+            response = self.condenser_evaluator_graph.execute_hybrid_graph(prompt=description)
+            response["job_title"] = jobs["title"].iloc[idx]
+            response["company"] = jobs["company"].iloc[idx]
+            response["id"] = jobs["id"].iloc[idx]
+            response["link"] = jobs["job_url"].iloc[idx]
+            response["date"] = jobs["date_posted"].iloc[idx].strftime("%d-%m-%Y")
+
+            yield json.dumps(response, indent=2)
+            await asyncio.sleep(0.25)
+
 
     

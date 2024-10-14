@@ -2,6 +2,8 @@ import JobGridCard from "@/components/JobGridCard";
 import { JobData, JobDataItem } from "@/app/script/jobDataInterfaces";
 import React, { Dispatch, MutableRefObject, SetStateAction } from "react";
 
+// TODO: Add integration for other LLM providers
+// TODO: Separate generateResponse and updateConfig functions
 const generateResponse = async (
   searchQuery: string,
   searchLocation: string,
@@ -14,10 +16,14 @@ const generateResponse = async (
   gridRef: MutableRefObject<HTMLDivElement | null>,
   setApiCalls: Dispatch<SetStateAction<number>>,
   setTokenUsage: Dispatch<SetStateAction<number>>,
+  setLoading: Dispatch<SetStateAction<boolean>>,
 ) => {
   setPersistJobGridComponentList((prevList) =>
     [...prevList, ...jobGridComponentList].sort((a, b) => b.score - a.score),
   );
+
+  setJobGridComponentList([]);
+  setLoading(true);
 
   if (isConfigured) {
     const response = await fetch(
@@ -40,7 +46,7 @@ const generateResponse = async (
   let tempId = 0;
 
   const response = await fetch(
-    `http://127.0.0.1:8000/stream-llm-hybrid?query=${searchQuery}&location=${searchLocation}&listings=${config["numListings"]}`,
+    `http://127.0.0.1:8000/stream-llm-jobspy?query=${searchQuery}&location=${searchLocation}&listings=${config["numListings"]}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json+stream" },
@@ -87,6 +93,7 @@ const generateResponse = async (
 
     jobDataList.sort((a, b) => b.score - a.score);
     setJobGridComponentList([...jobDataList]);
+    setLoading(false);
     setApiCalls((prevCalls) => (prevCalls += 1));
     setTokenUsage(
       (prevTokens) =>
@@ -100,10 +107,14 @@ const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
   const formData = new FormData();
   formData.append("file", file);
 
-  const response = await fetch("http://127.0.0.1:8000/upload-resume/", {
+  const response = await fetch(`http://127.0.0.1:8000/upload-resume`, {
     method: "POST",
     body: formData,
   });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
 
   const data = await response.json();
   console.log(data);
