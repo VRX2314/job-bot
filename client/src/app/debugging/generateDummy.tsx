@@ -1,29 +1,20 @@
-import JobGridCard from "@/components/JobGridCard";
 import { JobData, JobDataItem } from "@/app/script/jobDataInterfaces";
-import React, { Dispatch, MutableRefObject, SetStateAction } from "react";
+import React, { Dispatch, SetStateAction } from "react";
+import JobGridCard from "@/components/JobGridCard";
 
-// TODO: Add integration for other LLM providers
-// TODO: Separate generateResponse and updateConfig functions
-const generateResponse = async (
-  searchQuery: string,
-  searchLocation: string,
+export const generateDummyResponse = async (
   jobGridComponentList: JobDataItem[],
   setJobGridComponentList: Dispatch<SetStateAction<JobDataItem[]>>,
   setPersistJobGridComponentList: Dispatch<SetStateAction<JobDataItem[]>>,
   config: { [key: string]: string | number },
   isConfigured: boolean,
   setIsConfigured: Dispatch<SetStateAction<boolean>>,
-  gridRef: MutableRefObject<HTMLDivElement | null>,
   setApiCalls: Dispatch<SetStateAction<number>>,
   setTokenUsage: Dispatch<SetStateAction<number>>,
-  setLoading: Dispatch<SetStateAction<boolean>>,
 ) => {
   setPersistJobGridComponentList((prevList) =>
     [...prevList, ...jobGridComponentList].sort((a, b) => b.score - a.score),
   );
-
-  setJobGridComponentList([]);
-  setLoading(true);
 
   if (isConfigured) {
     const response = await fetch(
@@ -35,23 +26,22 @@ const generateResponse = async (
         body: JSON.stringify({ api_key: config["apiKey"] }),
       },
     );
+
+    console.log("isConfigured:", isConfigured);
     setIsConfigured(false);
 
     if (!response.ok || !response.body) {
       throw response.statusText;
     }
+
+    console.log(await response.json());
   }
 
-  gridRef.current?.scrollIntoView({ behavior: "smooth" });
   let tempId = 0;
-
-  const response = await fetch(
-    `http://127.0.0.1:8000/stream-llm-jobspy?query=${searchQuery}&location=${searchLocation}&listings=${config["numListings"]}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json+stream" },
-    },
-  );
+  const response = await fetch(`http://127.0.0.1:8000/stream-test`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json+stream" },
+  });
 
   if (!response.ok || !response.body) {
     throw response.statusText;
@@ -68,11 +58,8 @@ const generateResponse = async (
     }
 
     const decodedChunk = decoder.decode(value, { stream: true });
-
-    // String is parsed to JSON here
-    console.log(decodedChunk);
     const jobData: JobData = JSON.parse(decodedChunk);
-    console.log(jobData);
+
     jobDataList.push({
       jobCard: (
         <JobGridCard
@@ -90,38 +77,12 @@ const generateResponse = async (
     });
 
     tempId += 1;
-
-    jobDataList.sort((a, b) => b.score - a.score);
-    setJobGridComponentList([...jobDataList]);
-    setLoading(false);
     setApiCalls((prevCalls) => (prevCalls += 1));
     setTokenUsage(
       (prevTokens) =>
         (prevTokens += jobData.metadata_evaluator.token_usage.total_tokens),
     );
+    jobDataList.sort((a, b) => b.score - a.score);
+    setJobGridComponentList([...jobDataList]);
   }
 };
-
-const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  const file = e.target.files![0];
-  const formData = new FormData();
-  formData.append("file", file);
-
-  const response = await fetch(`http://127.0.0.1:8000/upload-resume`, {
-    method: "POST",
-    body: formData,
-  });
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  const data = await response.json();
-  console.log(data);
-};
-
-const renderJobGridComponents = (component: JobDataItem[]) => {
-  return component.map((data) => data.jobCard);
-};
-
-export { generateResponse, handleFileUpload, renderJobGridComponents };

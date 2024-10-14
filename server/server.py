@@ -59,6 +59,14 @@ async def hybrid_params():
     return {"prompt": str(crawler.hybrid.system_prompt)}
 
 
+@app.post("/stream-llm-hybrid")
+async def stream_llm_hybrid(query: str, location: str, listings: int = 1):
+    crawler = LLMCrawler(query, location, listings, model, resume)
+
+    return StreamingResponse(
+        crawler.scrape(hybrid=True), media_type="text/event-stream"
+    )
+
 @app.post("/stream-llm-jobspy")
 async def stream_llm_jobspy(query: str= "", location: str= "", listings: int = 1):
     # TODO: Add provider support

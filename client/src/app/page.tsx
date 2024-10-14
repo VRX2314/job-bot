@@ -26,6 +26,9 @@ import {
   renderJobGridComponents,
 } from "@/app/script/jobUtils";
 
+import { generateDummyResponse } from "@/app/debugging/generateDummy";
+import DebugMenu from "@/components/DebugMenu";
+
 const Home = () => {
   // TODO: Reduce clutter with useReducer
   const [jobGridComponentList, setJobGridComponentList] = useState<
@@ -70,6 +73,20 @@ const Home = () => {
   // TODO: Refactor to better align with SOLID principles
   return (
     <div className="flex flex-col items-center justify-center">
+      <DebugMenu
+        genResp={() =>
+          generateDummyResponse(
+            jobGridComponentList,
+            setJobGridComponentList,
+            setPersistJobGridComponentList,
+            config,
+            isConfigured,
+            setIsConfigured,
+            setApiCalls,
+            setTokenUsage,
+          )
+        }
+      />
       <div className="mt-32 flex w-full max-w-full flex-col items-center justify-center">
         <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
           Bot Interface V1
