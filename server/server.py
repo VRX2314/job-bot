@@ -1,9 +1,12 @@
+import os
+
 from fastapi import FastAPI, Body, File, UploadFile
 from typing import Union
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from model import LLMCrawler
+from pymongo import MongoClient
 
 from langchain_groq import ChatGroq
 
@@ -14,7 +17,15 @@ import pymupdf
 import re
 
 from jobspy import scrape_jobs
+
+from temp import temporary_resume
+import dotenv
+
+
+dotenv.load_dotenv()
+mongo_uri = os.getenv("MONGODBURI")
 app = FastAPI()
+db_client = MongoClient(mongo_uri)
 
 # To connect to front end
 origins = ["http://localhost:3000", "http://localhost:8000", "https://vrx2314-client--3000.prod1a.defang.dev"]
@@ -30,6 +41,17 @@ app.add_middleware(
 # TODO: Better State Management
 resume = """"""
 
+####### For DEV Only #######
+resume = temporary_resume()
+model = ChatGroq(
+        model="llama-3.1-70b-versatile",
+        temperature=0,
+        max_tokens=None,
+        timeout=None,
+        max_retries=2,
+    )
+
+############################ LLM Config and Calls ############################
 @app.post("/setup-params-groq")
 async def set_params_groq(
         api_key: Union[str, None] = Body(...), model_backbone: str = "llama-3.1-70b-versatile"
@@ -119,3 +141,20 @@ async def stream_json():
 async def stream_test():
     # return StreamingResponse(stream_json(), media_type="application/stream+json")
     return StreamingResponse(stream_json(), media_type="text/event-stream")
+
+############################ Data Persistence ############################
+@app.get("/mongo-test")
+async def mongo_test():
+    return db_client.list_database_names()
+
+@app.post("/mongo-insert-job")
+async def mongo_insert_job(job_listing: dict):
+    db = db_client.job_bot_db
+    collection = db.jobs
+    result = collection.insert_one(job_listing)
+
+    return {"result": str(result)}
+
+@app.get("/mongo-get-jobs")
+async def mongo_get_jobs():
+    pass
