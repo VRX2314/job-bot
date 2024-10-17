@@ -1,12 +1,17 @@
 import json
 import numpy as np
+import httpx
+
 from crawler import Crawler
 from agents import CondenserAgent, EvaluatorAgent, CondenserEvaluatorGraph, HybridAgent
 from playwright.async_api import async_playwright
 import asyncio
 
+from mongo_db_utils import mongo_insert_job
+
+
 class LLMCrawler(Crawler):
-    def __init__(self, query, location, listings,  model, resume):
+    def __init__(self, query, location, listings, model, resume):
         super().__init__(query, location, listings)
         # TODO: Implement Langgraph to make dynamic
         self.condenser = CondenserAgent(model)
@@ -28,7 +33,7 @@ class LLMCrawler(Crawler):
                 job_elements = await self.page.query_selector_all(
                     ".jobTitle.css-198pbd.eu4oa1w0"
                 )
-                
+
                 for job in job_elements:
                     scraped_job = await self.scrape_indeed(job)
                     if hybrid:
@@ -53,10 +58,10 @@ class LLMCrawler(Crawler):
                         response["date"] = scraped_job["Date"]
 
                     # TODO: Handle Gemma ```json ... ```
-                    yield json.dumps(response, indent=2) # Needs to be yielded as string for streaming
+                    yield json.dumps(response, indent=2)  # Needs to be yielded as string for streaming
 
                     # Adding randomness to avoid bot-detection
-                    await asyncio.sleep(np.random.choice(np.arange(1,3, 0.01)))
+                    await asyncio.sleep(np.random.choice(np.arange(1, 3, 0.01)))
 
                     ctx += 1
                     if self.listings == ctx:
@@ -72,17 +77,37 @@ class LLMCrawler(Crawler):
                     break
 
     async def infer(self, jobs):
-        for idx in range(len(jobs)):
-            description = jobs["description"].iloc[idx]
-            response = self.condenser_evaluator_graph.execute_hybrid_graph(prompt=description)
-            response["job_title"] = jobs["title"].iloc[idx]
-            response["company"] = jobs["company"].iloc[idx]
-            response["id"] = jobs["id"].iloc[idx]
-            response["link"] = jobs["job_url"].iloc[idx]
-            response["date"] = jobs["date_posted"].iloc[idx].strftime("%d-%m-%Y")
+        async with httpx.AsyncClient() as client:
+            for idx in range(len(jobs)):
+                description = jobs["description"].iloc[idx]
+
+                try:
+                    response = self.condenser_evaluator_graph.execute_hybrid_graph(prompt=description)
+                except Exception as e:
+                    print(e)
+                    break
+
+                response["job_title"] = jobs["title"].iloc[idx]
+                response["company"] = jobs["company"].iloc[idx]
+                response["id"] = jobs["id"].iloc[idx]
+                response["link"] = jobs["job_url"].iloc[idx]
+                response["date"] = jobs["date_posted"].iloc[idx].strftime("%d-%m-%Y")
+
+                response_data_job = {key: response[key] for key in
+                                     response.keys() & {"id", "job_title", "company", "link", "date"}}
+
+                response_data_user = {"id": response["id"]}
+                response_data_user.update({key: response["response_evaluator"][key] for key in
+                                           response["response_evaluator"].keys() & {"score", "reasons_match",
+                                                                                    "reasons_no_match",
+                                                                                    "reasons_match_c",
+                                                                                    "reasons_no_match_c"}})
+
+                try:
+                    await client.post("http://localhost:8000/mongo-insert-job", json=response_data_job)
+                    await client.post("http://localhost:8000/mongo-insert-user-data", json=response_data_user)
+                except Exception as e:
+                    print("Error: ", e)
 
             yield json.dumps(response, indent=2)
             await asyncio.sleep(0.25)
-
-
-    
