@@ -1,5 +1,7 @@
 import json
 import numpy as np
+import httpx
+
 from crawler import Crawler
 from agents import CondenserAgent, EvaluatorAgent, CondenserEvaluatorGraph, HybridAgent
 from playwright.async_api import async_playwright
@@ -74,22 +76,29 @@ class LLMCrawler(Crawler):
                     break
 
     async def infer(self, jobs):
-        for idx in range(len(jobs)):
-            description = jobs["description"].iloc[idx]
+        async with httpx.AsyncClient() as client:
+            for idx in range(len(jobs)):
+                description = jobs["description"].iloc[idx]
 
-            response = self.condenser_evaluator_graph.execute_hybrid_graph(prompt=description)
-            response["job_title"] = jobs["title"].iloc[idx]
-            response["company"] = jobs["company"].iloc[idx]
-            response["id"] = jobs["id"].iloc[idx]
-            response["link"] = jobs["job_url"].iloc[idx]
-            response["date"] = jobs["date_posted"].iloc[idx].strftime("%d-%m-%Y")
+                try:
+                    response = self.condenser_evaluator_graph.execute_hybrid_graph(prompt=description)
+                except Exception as e:
+                    print(e)
+                    break
 
-            response_data_entry = {key: response[key] for key in
-                                   response.keys() & {"id", "job_title", "company", "link", "date"}}
-            try:
-                response = mongo_insert_job(response_data_entry)
-            except Exception as e:
-                print("Error: ", e)
+                response["job_title"] = jobs["title"].iloc[idx]
+                response["company"] = jobs["company"].iloc[idx]
+                response["id"] = jobs["id"].iloc[idx]
+                response["link"] = jobs["job_url"].iloc[idx]
+                response["date"] = jobs["date_posted"].iloc[idx].strftime("%d-%m-%Y")
+
+                response_data_entry = {key: response[key] for key in
+                                       response.keys() & {"id", "job_title", "company", "link", "date"}}
+
+                try:
+                    response_db = await client.post("http://localhost:8000/mongo-insert-job", json=response_data_entry)
+                except Exception as e:
+                    print("Error: ", e)
 
             yield json.dumps(response, indent=2)
             await asyncio.sleep(0.25)
