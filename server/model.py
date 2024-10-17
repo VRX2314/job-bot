@@ -9,6 +9,7 @@ import asyncio
 
 from mongo_db_utils import mongo_insert_job
 
+
 class LLMCrawler(Crawler):
     def __init__(self, query, location, listings, model, resume):
         super().__init__(query, location, listings)
@@ -92,11 +93,19 @@ class LLMCrawler(Crawler):
                 response["link"] = jobs["job_url"].iloc[idx]
                 response["date"] = jobs["date_posted"].iloc[idx].strftime("%d-%m-%Y")
 
-                response_data_entry = {key: response[key] for key in
-                                       response.keys() & {"id", "job_title", "company", "link", "date"}}
+                response_data_job = {key: response[key] for key in
+                                     response.keys() & {"id", "job_title", "company", "link", "date"}}
+
+                response_data_user = {"id": response["id"]}
+                response_data_user.update({key: response["response_evaluator"][key] for key in
+                                           response["response_evaluator"].keys() & {"score", "reasons_match",
+                                                                                    "reasons_no_match",
+                                                                                    "reasons_match_c",
+                                                                                    "reasons_no_match_c"}})
 
                 try:
-                    response_db = await client.post("http://localhost:8000/mongo-insert-job", json=response_data_entry)
+                    await client.post("http://localhost:8000/mongo-insert-job", json=response_data_job)
+                    await client.post("http://localhost:8000/mongo-insert-user-data", json=response_data_user)
                 except Exception as e:
                     print("Error: ", e)
 

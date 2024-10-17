@@ -50,6 +50,7 @@ model = ChatGroq(
         timeout=None,
         max_retries=2,
     )
+user = "sas the ass"
 
 ############################ LLM Config and Calls ############################
 @app.post("/setup-params-groq")
@@ -152,6 +153,16 @@ async def mongo_insert_job(job_listing: dict):
     db = db_client.job_bot_db
     collection = db.jobs
     result = collection.insert_one(job_listing)
+
+    return {"result": str(result)}
+
+@app.post("/mongo-insert-user-data")
+async def mongo_insert_user_data(user_data: dict):
+    user_data["user"] = user
+
+    db = db_client.job_bot_db
+    collection = db.llm_outs
+    result = collection.insert_one(user_data)
 
     return {"result": str(result)}
 
